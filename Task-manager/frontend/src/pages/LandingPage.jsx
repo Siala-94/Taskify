@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Logo from "../atomic/Logo.jsx";
 
 const LandingPage = () => {
   return (
     <>
+      <Logo base="bg-base-100" />
       <div className="hero bg-base-100 min-h-screen">
         <div className="hero-content flex-col ">
           <div className="text-center ">

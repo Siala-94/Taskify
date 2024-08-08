@@ -8,11 +8,6 @@ import { Link } from "react-router-dom";
 const App = () => {
   return (
     <>
-      <div className="navbar bg-base-100">
-        <Link to="/" className=" text-primary text-3xl">
-          Taskify
-        </Link>
-      </div>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />

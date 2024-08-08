@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Logo from "../atomic/Logo.jsx";
 const RegisterPage = () => {
   return (
     <>
+      <Logo base="bg-base-100" />
       <div className="hero bg-base-100 min-h-screen">
         <div className="hero-content w-5/6 flex-col ">
           <div className="card bg-base-100 text-center  w-full max-w-sm shrink-0 shadow-2xl">

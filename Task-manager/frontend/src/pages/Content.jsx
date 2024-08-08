@@ -15,7 +15,7 @@ function DropDownButton({ text, children }) {
       </div>
       <ul
         tabIndex={0}
-        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+        className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
       >
         <li>
           <a>Item 1</a>
@@ -31,7 +31,7 @@ function DropDownButton({ text, children }) {
 function TaskAdder(props) {
   return (
     <div
-      className="card-rounded flex  w-96 flex-row hover:text-primary text-neutral-content "
+      className="card-rounded flex  w-96 flex-row hover:text-primary text-secondary "
       onClick={props.onClick}
     >
       <PlusIcon />

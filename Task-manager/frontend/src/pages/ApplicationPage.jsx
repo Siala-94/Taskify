@@ -9,8 +9,8 @@ import ContentTest from "./ContentTest.jsx";
 const ApplicationPage = () => {
   return (
     <div className="flex ">
-      <div className="bg-base-300 h-screen w-1/5">
-        <Logo base="bg-base-200" />
+      <div className="card bg-base-300  h-screen w-1/5">
+        <Logo base="bg-base-300" />
         <LeftMenuTest />
 
         <CollapsableLeftMenu />

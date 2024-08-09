@@ -5,7 +5,8 @@ import PriorityIcon from "../assets/icons/PriorityIcon.jsx";
 import CalendarIcon from "../assets/icons/CalendarIcon.jsx";
 import LabelIcon from "../assets/icons/LabelIcon.jsx";
 import PersonIcon from "../assets/icons/PersonIcon.jsx";
-import DatePicker from "../molecular/DatePicker.jsx";
+import ModalButton from "./ModalButton.jsx";
+import Button from "./Button.jsx";
 
 function DropDown(props) {
   return (
@@ -18,9 +19,7 @@ function DropDown(props) {
       <ul
         tabIndex={0}
         className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-      >
-        <DatePicker />
-      </ul>
+      ></ul>
     </div>
   );
 }
@@ -31,7 +30,7 @@ const Modal = (props) => {
       {/* The button to open modal */}
       <label
         htmlFor="my_modal_7"
-        className="btn bg-base-100 hover:text-primary hover:bg-base-100 justify-start ml-10 "
+        className="btn btn-xs border-base-100 bg-base-100 hover:text-primary hover:bg-base-100 justify-start ml-4 "
       >
         <PlusIcon />
         {props.text}
@@ -63,6 +62,7 @@ const Modal = (props) => {
             <PersonIcon />{" "}
           </DropDown>
           <div className="hero flex justify-end">
+            <Button className="btn bg-base-100 ">cancel</Button>
             <button className="btn bg-base-100 ">cancel</button>
             <button className="btn bg-base-100  ml-6"> submit</button>
           </div>

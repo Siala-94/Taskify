@@ -4,7 +4,7 @@ import TodayIcon from "../assets/icons/TodayIcon";
 import CalendarIcon from "../assets/icons/CalendarIcon";
 const LeftMenuTest = () => {
   return (
-    <ul className="menu bg-base-300 rounded-box w-56">
+    <ul className="menu bg-base-300  rounded-box w-56">
       <li>
         <InboxIcon />
       </li>

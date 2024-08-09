@@ -1,30 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import PlusIcon from "../assets/icons/PlusIcon";
 import Modal from "../atomic/Modal.jsx";
-function Parent(props) {
+import TestModal from "../components/TestModal.jsx";
+
+function Project(props) {
+  const [hover, setHover] = useState();
   return (
-    <>
-      <details>
-        <summary className="justify-items-end">{props.type}</summary>
-        <ul>
-          <li>
-            <a>item 1</a>
-          </li>
-        </ul>
-      </details>
-    </>
+    <ul>
+      <li>
+        <details>
+          <summary
+            onMouseEnter={() => {
+              setHover(true);
+            }}
+            onMouseLeave={() => {
+              setHover(false);
+            }}
+            className="justify-items-start"
+          >
+            {hover ? <TestModal hoverHandler={setHover} /> : <></>}
+
+            {props.name}
+          </summary>
+          <ul>{props.children}</ul>
+        </details>
+      </li>
+    </ul>
   );
 }
+
 const CollapsableLeftMenu = () => {
+  const [projects, setProjects] = useState("");
   return (
     <>
       <ul className="menu bg-base-300  rounded-box w-45">
         <li>
-          <Parent type="Favorites" addIcon={false} />
+          <details>
+            <summary className="justify-items-start">Favorites</summary>
+          </details>
         </li>
-        <li>
-          <Parent type="Projects" addIcon={true} />
-        </li>
+        <Project name="Projects" />
       </ul>
     </>
   );

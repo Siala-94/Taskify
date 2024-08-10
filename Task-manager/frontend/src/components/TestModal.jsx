@@ -1,13 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import PlusIcon from "../assets/icons/PlusIcon";
 import Input from "../molecular/Input.jsx";
 
-export default function TestModal(props) {
-  const [showModal, setShowModal] = React.useState(false);
+export default function TestModal({ projectId, addProject }) {
+  const [showModal, setShowModal] = useState(false);
+  const [projectName, setProjectName] = useState("");
 
-  // Function to close modal when clicking outside of it
   const handleOutsideClick = (e) => {
     if (e.target.id === "modal-backdrop") {
+      setShowModal(false);
+    }
+  };
+
+  const handleSave = () => {
+    if (projectName.trim()) {
+      addProject(projectId, projectName);
+      setProjectName("");
       setShowModal(false);
     }
   };
@@ -19,7 +27,6 @@ export default function TestModal(props) {
         onClick={() => setShowModal(true)}
       >
         <PlusIcon />
-        {props.text}
       </button>
       {showModal ? (
         <>
@@ -29,23 +36,28 @@ export default function TestModal(props) {
             onClick={handleOutsideClick}
           >
             <div className="card w-1/3">
-              {/*content*/}
               <div
                 className="card-body bg-neutral"
-                onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
+                onClick={(e) => e.stopPropagation()}
               >
-                <span className="card-title"> Add project</span>
+                <span className="card-title">Add project</span>
                 <label className="input input-bordered flex gap-2">
                   <input
                     type="text"
                     className="grow"
                     placeholder="project name"
-                  ></input>
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                  />
                 </label>
 
                 <div className="card flex-row justify-end gap-3">
-                  <button className="btn">cancel</button>
-                  <button className="btn ">save</button>
+                  <button className="btn" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                  <button className="btn" onClick={handleSave}>
+                    Save
+                  </button>
                 </div>
               </div>
             </div>

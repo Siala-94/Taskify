@@ -15,7 +15,12 @@ const ApplicationPage = () => {
 
         <CollapsableLeftMenu />
       </div>
-      <ContentTest />
+      <div className="card flex-row w-full">
+        <Content section={"inbox"} />
+        <div className="bg-base-100 border-l border-primary w-2/4">
+          <p className="text-center">something</p>
+        </div>
+      </div>
     </div>
   );
 };

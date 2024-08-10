@@ -31,7 +31,7 @@ function DropDownButton({ text, children }) {
 function TaskAdder(props) {
   return (
     <div
-      className="card-rounded flex  w-96 flex-row hover:text-primary text-secondary "
+      className="card-rounded flex  w-96 flex-row hover:text-primary text-primary "
       onClick={props.onClick}
     >
       <PlusIcon />
@@ -153,7 +153,7 @@ export default function Content(props) {
   }
   return (
     <>
-      <div className="card mt-5 flex flex-col gap-5  w-full items-stretch">
+      <div className="card mt-5 ml-5 flex flex-col gap-5  w-full items-stretch">
         <SectionName name={props.section} />
         <Tasks tasks={tasks} setTasks={setTasks} />
 

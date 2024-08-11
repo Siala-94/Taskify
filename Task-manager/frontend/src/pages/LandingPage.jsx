@@ -1,8 +1,34 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.js";
 import Logo from "../atomic/Logo.jsx";
 
 const LandingPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("successfully signed in", user);
+      alert("switching route");
+      navigate("/application");
+    } catch (error) {
+      console.log(error.code, error.message);
+      error.message === "Firebase: Error (auth/invalid-credential)."
+        ? alert("wrong username or password")
+        : console.log(error.message);
+    }
+  };
+
   return (
     <>
       <Logo base="bg-base-100" />
@@ -15,7 +41,7 @@ const LandingPage = () => {
             </p>
           </div>
           <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
-            <form className="card-body">
+            <form className="card-body" onSubmit={handleSignIn}>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
@@ -24,6 +50,10 @@ const LandingPage = () => {
                   type="email"
                   placeholder="email"
                   className="input input-bordered"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
                   required
                 />
               </div>
@@ -35,18 +65,17 @@ const LandingPage = () => {
                   type="password"
                   placeholder="password"
                   className="input input-bordered"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
                   required
                 />
-                <label className="label">
-                  <Link to="/registe" className="label-text-alt link link-hove">
-                    Forgot password?
-                  </Link>
-                </label>
               </div>
               <div className="form-control mt-6">
-                <Link to="/application" className="btn btn-primary">
-                  Login
-                </Link>
+                <button type="submit" className="btn btn-primary">
+                  Sign in
+                </button>
               </div>
               <p>
                 don't have an account?

@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, browserLocalPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,4 +13,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+auth
+  .setPersistence(browserLocalPersistence)
+  .then(() => {
+    console.log("Persistence is set to 'LOCAL'");
+    // Now you can proceed with sign-in
+    // Example: signInWithEmailAndPassword(auth, email, password);
+  })
+  .catch((error) => {
+    console.error("Error setting persistence: ", error);
+  });
 export { auth };

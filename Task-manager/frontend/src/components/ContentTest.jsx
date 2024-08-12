@@ -1,7 +1,7 @@
 import React from "react";
-import Divider from "./Divider";
+import Divider from "./Divider.jsx";
 import Modal from "../atomic/Modal.jsx";
-import TestModal from "../components/TestModal.jsx";
+import TestModal from "./TestModal.jsx";
 
 function Task(props) {
   return (

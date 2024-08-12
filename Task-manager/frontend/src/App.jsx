@@ -20,12 +20,12 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={user ? <ApplicationPage /> : <LandingPage />}
+          element={user ? <ApplicationPage user={user} /> : <LandingPage />}
         />
         <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/application"
-          element={user ? <ApplicationPage /> : <LandingPage />}
+          element={user ? <ApplicationPage user={user} /> : <LandingPage />}
         ></Route>
       </Routes>
     </>

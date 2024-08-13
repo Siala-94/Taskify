@@ -13,4 +13,5 @@ const sectionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Section", sectionSchema);
+const Section = mongoose.model("section", sectionSchema);
+export default Section;

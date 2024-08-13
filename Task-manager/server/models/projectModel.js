@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    description: { type: String },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    members: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    ],
     sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     parentProject: { type: mongoose.Schema.Types.ObjectId, ref: "Project" }, // For subprojects
   },

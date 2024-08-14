@@ -25,6 +25,25 @@ export const addProject = async (req, res) => {
   }
 };
 
+const removeSubProjects = async (subProjectIds) => {
+  for (const subProjectId of subProjectIds) {
+    const subProject = await Project.findByIdAndDelete(subProjectId);
+
+    if (subProject) {
+      // Recursively remove subprojects
+      if (subProject.subProjects && subProject.subProjects.length > 0) {
+        await removeSubProjects(subProject.subProjects);
+      }
+
+      // Update each user in the members array to remove the subproject reference
+      await User.updateMany(
+        { _id: { $in: subProject.members } }, // Find users whose _id is in the members array
+        { $pull: { projects: subProjectId } } // Remove the subproject _id from their projects array
+      );
+    }
+  }
+};
+
 export const removeProject = async (req, res) => {
   console.log("incoming request to remove project");
   const { projectId } = req.params;
@@ -32,13 +51,19 @@ export const removeProject = async (req, res) => {
 
   try {
     // Find the project to be removed
-    const project = await Project.findByIdAndDelete(projectId);
+    const project = await Project.findById(projectId);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Remove the project
+    // Remove all subprojects recursively
+    if (project.subProjects && project.subProjects.length > 0) {
+      await removeSubProjects(project.subProjects);
+    }
+
+    // Remove the main project
+    await Project.findByIdAndDelete(projectId);
 
     // Update each user in the members array to remove the project reference
     await User.updateMany(
@@ -46,7 +71,9 @@ export const removeProject = async (req, res) => {
       { $pull: { projects: projectId } } // Remove the project _id from their projects array
     );
 
-    res.status(200).json({ message: "Project removed successfully" });
+    res
+      .status(200)
+      .json({ message: "Project and its subprojects removed successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -60,7 +87,8 @@ export const getProjectByUserObjectId = async (req, res) => {
   }
 
   try {
-    const user = await Project.findOne({ members: objectId });
+    const user = await Project.find({ members: objectId });
+    console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

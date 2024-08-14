@@ -7,8 +7,8 @@ const Modal = ({ isOpen, onClose, children }) => {
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 z-50 flex justify-center items-center transition-opacity ${
-        isOpen ? "visible bg-base-100/60 opacity-100" : "invisible opacity-0"
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity ${
+        isOpen ? "visible opacity-100" : "invisible opacity-0"
       }`}
     >
       <div
@@ -21,24 +21,27 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const AddProjectModal = ({ user, reload }) => {
+const AddSubProjectModal = ({ user, projectID, reload }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const URL = "http://localhost:3000";
-  const navigate = useNavigate();
 
   const handleNewProject = async (e) => {
     e.preventDefault();
+
     const members = [user._id];
     try {
-      const res = await axios.post(`${URL}/project/add`, {
-        name: projectName,
-        members: members,
-      });
-      console.log("res", res);
+      const res = await axios.post(
+        `${URL}/project/addSubProject/${projectID}`,
+        {
+          name: projectName,
+          members: members,
+        }
+      );
+
       setIsOpen(false); // Close the modal after submission
       setProjectName(""); // Reset the project name input
-      reload(); // Call the reload function to refresh the project list
+      reload();
     } catch (error) {
       console.error(error);
     }
@@ -47,7 +50,7 @@ const AddProjectModal = ({ user, reload }) => {
   return (
     <>
       <button
-        className="btn justify-start btn-xs bg-base-300 border-base-300 hover:text-primary"
+        className=" hover:text-primary"
         onClick={() => {
           setIsOpen(true);
         }}
@@ -89,4 +92,4 @@ const AddProjectModal = ({ user, reload }) => {
   );
 };
 
-export default AddProjectModal;
+export default AddSubProjectModal;

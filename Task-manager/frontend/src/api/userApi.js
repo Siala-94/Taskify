@@ -11,3 +11,13 @@ export const getUserById = async (uid) => {
     console.error(error);
   }
 };
+
+export const getProjectByObjectIds = async (ObjectId) => {
+  try {
+    const response = await axios.get(`${URL}/project/get/${ObjectId}`);
+
+    return response.data;
+  } catch (error) {
+    console.error;
+  }
+};

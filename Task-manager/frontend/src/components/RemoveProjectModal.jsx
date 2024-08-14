@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import PlusIcon from "../assets/icons/PlusIcon";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import TrashIcon from "../assets/icons/TrashIcon";
 
 const Modal = ({ isOpen, onClose, children }) => {
   return (
@@ -21,24 +21,20 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const AddProjectModal = ({ user, reload }) => {
+const RemoveProjectModal = ({ projectID, reload }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [projectName, setProjectName] = useState("");
-  const URL = "http://localhost:3000";
-  const navigate = useNavigate();
 
-  const handleNewProject = async (e) => {
+  const URL = "http://localhost:3000";
+
+  const handleRemoveProject = async (e) => {
     e.preventDefault();
-    const members = [user._id];
+
     try {
-      const res = await axios.post(`${URL}/project/add`, {
-        name: projectName,
-        members: members,
-      });
-      console.log("res", res);
+      console.log(projectID);
+      const res = await axios.delete(`${URL}/project/delete/${projectID}`);
+      console.log(res);
       setIsOpen(false); // Close the modal after submission
-      setProjectName(""); // Reset the project name input
-      reload(); // Call the reload function to refresh the project list
+      reload();
     } catch (error) {
       console.error(error);
     }
@@ -47,12 +43,12 @@ const AddProjectModal = ({ user, reload }) => {
   return (
     <>
       <button
-        className="btn justify-start btn-xs bg-base-300 border-base-300 hover:text-primary"
+        className=" hover:text-primary"
         onClick={() => {
           setIsOpen(true);
         }}
       >
-        <PlusIcon />
+        <TrashIcon/>
       </button>
       <Modal
         isOpen={isOpen}
@@ -60,27 +56,11 @@ const AddProjectModal = ({ user, reload }) => {
           setIsOpen(false);
         }}
       >
-        <form className="card-body" onSubmit={handleNewProject}>
-          <div className="form-control">
-            <input
-              className="input input-bordered"
-              placeholder="project name"
-              value={projectName}
-              onChange={(e) => {
-                setProjectName(e.target.value);
-              }}
-            />
-          </div>
+        <form className="card-body" onSubmit={handleRemoveProject}>
+          <div className="form-control">Are you sure you want to delete?</div>
           <div className="hero flex justify-end mt-4">
-            <button
-              className="btn bg-base-100"
-              type="button"
-              onClick={() => setIsOpen(false)}
-            >
-              cancel
-            </button>
             <button className="btn bg-base-100 ml-6" type="submit">
-              submit
+              delete
             </button>
           </div>
         </form>
@@ -89,4 +69,4 @@ const AddProjectModal = ({ user, reload }) => {
   );
 };
 
-export default AddProjectModal;
+export default RemoveProjectModal;

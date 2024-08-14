@@ -23,6 +23,7 @@ const LandingPage = () => {
       navigate("/application");
     } catch (error) {
       console.log(error.code, error.message);
+      alert(error.message);
       error.message === "Firebase: Error (auth/invalid-credential)."
         ? alert("wrong username or password")
         : console.log(error.message);

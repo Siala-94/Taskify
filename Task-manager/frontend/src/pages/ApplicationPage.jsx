@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LeftMenu from "../components/LeftMenu.jsx";
 import Content from "../components/Content.jsx";
 import Divider from "../components/Divider.jsx";
@@ -10,10 +10,110 @@ import { auth } from "../firebase.js";
 import { signOut } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import PlusIcon from "../assets/icons/PlusIcon.jsx";
+import { getProjectByObjectIds } from "../api/userApi.js";
+import AddSubProjectModal from "../components/AddSubProjectModal.jsx";
+import RemoveProjectModal from "../components/RemoveProjectModal.jsx";
+import EllipsisVertical from "../assets/icons/EllipsisVertical.jsx";
+
+const Project = ({ user, project, handlerFunction }) => {
+  if (!user) return null; // Ensure user is defined
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <ul>
+      {project.map((pl) => (
+        <li className="flex flex-row" key={pl._id}>
+          <details>
+            <summary
+              className="hover:bg-base-300"
+              onClick={() => {
+                handlerFunction(pl.name);
+              }}
+            >
+              <button
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                }}
+                className="hover:text-primary"
+              >
+                <EllipsisVertical />
+              </button>
+
+              {pl.name}
+              {isOpen && (
+                <div className="fixed mt-10 flex flex-col">
+                  <AddSubProjectModal user={user} projectID={pl._id} />
+
+                  <RemoveProjectModal projectID={pl._id} />
+                </div>
+              )}
+            </summary>
+            {pl.subProjects && (
+              <Project
+                user={user}
+                project={pl.subProjects}
+                handlerFunction={handlerFunction}
+              />
+            )}
+          </details>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const ApplicationPage = ({ user }) => {
   const [project, setProject] = useState("");
+  const [projectList, setProjectList] = useState([]);
   const navigate = useNavigate();
+
+  const populateProjectList = (projects) => {
+    const projectMap = new Map();
+
+    projects.forEach((project) => {
+      projectMap.set(project._id, { ...project, subProjects: [] });
+    });
+
+    const nestedProjects = [];
+
+    projects.forEach((project) => {
+      if (project.subProjects && project.subProjects.length > 0) {
+        project.subProjects.forEach((subProjectId) => {
+          if (projectMap.has(subProjectId)) {
+            projectMap
+              .get(project._id)
+              .subProjects.push(projectMap.get(subProjectId));
+          }
+        });
+      }
+    });
+
+    projects.forEach((project) => {
+      const isSubProject = projects.some((p) =>
+        p.subProjects.includes(project._id)
+      );
+      if (!isSubProject) {
+        nestedProjects.push(projectMap.get(project._id));
+      }
+    });
+
+    return nestedProjects;
+  };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!user || !user._id) return;
+
+      try {
+        const projectLists = await getProjectByObjectIds(user._id);
+        const populatedList = populateProjectList(projectLists);
+        setProjectList(populatedList);
+      } catch (error) {
+        console.error("Error fetching projects", error);
+      }
+    };
+
+    fetchProjects();
+  }, [user]);
 
   const handleSetProject = (projectName) => {
     setProject(projectName);
@@ -21,13 +121,13 @@ const ApplicationPage = ({ user }) => {
 
   const handleLinkClick = () => {
     setProject("inbox");
-    auth ? navigate("/application") : navigate("/"); // Ensure it navigates to the application route
+    auth ? navigate("/application") : navigate("/");
   };
 
-  const handleSignOut = async (e) => {
+  const handleSignOut = async () => {
     try {
       await signOut(auth);
-      navigate("/"); // Navigate to the home page after signing out
+      navigate("/");
     } catch (error) {
       console.error(error.message);
     }
@@ -58,14 +158,18 @@ const ApplicationPage = ({ user }) => {
         </button>
 
         <LeftMenu handlerFunction={handleSetProject} />
-        <ul className="menu bg-base-300 rounded-box w-45">
+        <ul className="menu bg-base-300  rounded-box w-45">
           <AddProjectModal user={user} />
           <li>
-            <details className="">
-              <summary className="justify-items-start">Projects</summary>
-              <ul>
-                <li>{console.log(user.projects)}</li>
-              </ul>
+            <details className=" ">
+              <summary className="justify-items-start hover:bg-base-300">
+                Projects
+              </summary>
+              <Project
+                user={user}
+                project={projectList}
+                handlerFunction={handleSetProject}
+              />
             </details>
           </li>
         </ul>

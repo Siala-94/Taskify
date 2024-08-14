@@ -15,13 +15,13 @@ import AddSubProjectModal from "../components/AddSubProjectModal.jsx";
 import RemoveProjectModal from "../components/RemoveProjectModal.jsx";
 import EllipsisVertical from "../assets/icons/EllipsisVertical.jsx";
 
-const Project = ({ user, project, handlerFunction }) => {
+const Project = ({ user, project, handlerFunction, reload }) => {
   if (!user) return null; // Ensure user is defined
   const [isOpen, setIsOpen] = useState(false);
   return (
     <ul>
       {project.map((pl) => (
-        <li className="flex flex-row" key={pl._id}>
+        <li className=" justify-between" key={pl._id}>
           <details>
             <summary
               className="hover:bg-base-300"
@@ -29,23 +29,16 @@ const Project = ({ user, project, handlerFunction }) => {
                 handlerFunction(pl.name);
               }}
             >
-              <button
-                onClick={() => {
-                  setIsOpen(!isOpen);
-                }}
-                className="hover:text-primary"
-              >
-                <EllipsisVertical />
-              </button>
+              <div className="flex  ">
+                <AddSubProjectModal
+                  user={user}
+                  projectID={pl._id}
+                  reload={reload}
+                />
+                <RemoveProjectModal projectID={pl._id} reload={reload} />
+              </div>
 
               {pl.name}
-              {isOpen && (
-                <div className="fixed mt-10 flex flex-col">
-                  <AddSubProjectModal user={user} projectID={pl._id} />
-
-                  <RemoveProjectModal projectID={pl._id} />
-                </div>
-              )}
             </summary>
             {pl.subProjects && (
               <Project
@@ -98,20 +91,19 @@ const ApplicationPage = ({ user }) => {
 
     return nestedProjects;
   };
+  const fetchProjects = async () => {
+    if (!user || !user._id) return;
+
+    try {
+      const projectLists = await getProjectByObjectIds(user._id);
+      const populatedList = populateProjectList(projectLists);
+      setProjectList(populatedList);
+    } catch (error) {
+      console.error("Error fetching projects", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      if (!user || !user._id) return;
-
-      try {
-        const projectLists = await getProjectByObjectIds(user._id);
-        const populatedList = populateProjectList(projectLists);
-        setProjectList(populatedList);
-      } catch (error) {
-        console.error("Error fetching projects", error);
-      }
-    };
-
     fetchProjects();
   }, [user]);
 
@@ -144,39 +136,52 @@ const ApplicationPage = ({ user }) => {
             Taskify
           </button>
         </div>
-        <Divider />
-        <button className="btn bg-base-300 border-base-300 ml-2 mr-2 hover:bg-base-100 flex items-center">
-          <div className="avatar flex items-center">
-            <div className="ring-base-100 ring-offset-secondary h-6 w-6 rounded-full ring ring-offset-1">
-              <img
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                alt="avatar"
-              />
-            </div>
-            <p className="text-xs ml-2">{user ? user.email : "Guest"}</p>
-          </div>
-        </button>
 
+        <div className="dropdown">
+          <div tabIndex={0} role="button" className="">
+            <button className="btn bg-base-300 border-base-300 ml-2 mr-2 hover:bg-base-100 flex items-center">
+              <div className="avatar flex items-center">
+                <div className="ring-base-100 ring-offset-secondary h-6 w-6 rounded-full ring ring-offset-1">
+                  <img
+                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                    alt="avatar"
+                  />
+                </div>
+                <p className="text-xs ml-2">{user ? user.email : "Guest"}</p>
+              </div>
+            </button>
+          </div>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+          >
+            <li>
+              <button onClick={handleSignOut}>Sign out</button>
+            </li>
+            <li>
+              <button>Settings</button>
+            </li>
+          </ul>
+        </div>
+
+        <Divider />
         <LeftMenu handlerFunction={handleSetProject} />
         <ul className="menu bg-base-300  rounded-box w-45">
-          <AddProjectModal user={user} />
           <li>
             <details className=" ">
               <summary className="justify-items-start hover:bg-base-300">
                 Projects
               </summary>
+              <AddProjectModal user={user} reload={fetchProjects} />
               <Project
                 user={user}
                 project={projectList}
                 handlerFunction={handleSetProject}
+                reload={fetchProjects}
               />
             </details>
           </li>
         </ul>
-        <div className="flex mt-auto gap-3">
-          <button onClick={handleSignOut}>Sign out</button>
-          <button>Settings</button>
-        </div>
       </div>
       <div className="card flex-row w-full">
         <Content section={project ? project : "inbox"} />

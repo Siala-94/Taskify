@@ -53,6 +53,7 @@ const AddProjectModal = ({ user, reload }) => {
         }}
       >
         <PlusIcon />
+        add root project
       </button>
       <Modal
         isOpen={isOpen}

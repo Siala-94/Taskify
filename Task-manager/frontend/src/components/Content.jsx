@@ -1,11 +1,29 @@
 import Divider from "./Divider";
 import PlusIcon from "../assets/icons/PlusIcon";
-import CalendarIcon from "../assets/icons/CalendarIcon";
+
 import PriorityIcon from "../assets/icons/PriorityIcon";
 import LabelIcon from "../assets/icons/LabelIcon";
 import Folder from "../assets/icons/Folder";
 import { useState } from "react";
 
+function CalendarIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-4 h-4"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
+      />
+    </svg>
+  );
+}
 function DropDownButton({ text, children }) {
   return (
     <div className="flex dropdown dropdown-bottom">
@@ -31,7 +49,7 @@ function DropDownButton({ text, children }) {
 function TaskAdder(props) {
   return (
     <div
-      className="card-rounded flex  w-96 flex-row hover:text-primary text-primary "
+      className="card-rounded flex  w-96 flex-row hover:text-primary "
       onClick={props.onClick}
     >
       <PlusIcon />
@@ -54,7 +72,7 @@ function ExpandedTaskAdder(props) {
   return (
     <div className="card w-fit bg-base-200 gap-2">
       <form>
-        <label className="input input-primary input-xs flex items-center gap-2">
+        <label className="input mb-1 border input-primary input-xs flex items-center gap-2">
           <input
             type="text"
             value={inputVal}
@@ -118,7 +136,7 @@ function Tasks({ tasks, setTasks }) {
               <input
                 type="checkbox"
                 onChange={() => handleChecked(task.id)}
-                className="checkbox hover:checkbox-primary"
+                className="checkbox checkbox-sm hover:checkbox-primary"
               />
               <div className="card">
                 <span className="label-text">{task.name}</span>

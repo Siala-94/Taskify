@@ -20,7 +20,7 @@ const LandingPage = () => {
       const user = userCredential.user;
       console.log("successfully signed in", user);
       alert("switching route");
-      navigate("/application");
+      navigate("/");
     } catch (error) {
       console.log(error.code, error.message);
       alert(error.message);

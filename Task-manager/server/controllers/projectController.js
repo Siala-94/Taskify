@@ -1,6 +1,5 @@
 import Project from "../models/projectModel.js";
 import User from "../models/userModel.js";
-import Section from "../models/sectionModel.js"; // Ensure you import the Section model
 
 export const addProject = async (req, res) => {
   console.log("incoming request to add project");
@@ -96,73 +95,6 @@ export const getProjectByUserObjectId = async (req, res) => {
   } catch (error) {
     console.error("Error retrieving user:", error);
     res.status(500).json({ error: error.message }); // Sending JSON error response
-  }
-};
-
-export const addSectionToProject = async (req, res) => {
-  const { projectId } = req.params;
-  const { sectionId } = req.body;
-
-  if (!projectId || !sectionId) {
-    return res
-      .status(400)
-      .json({ error: "projectId and sectionId are required" });
-  }
-
-  try {
-    const project = await Project.findById(projectId);
-
-    if (!project) {
-      return res.status(404).json({ error: "Project not found" });
-    }
-
-    // Check if the sectionId exists
-    const section = await Section.findById(sectionId);
-    if (!section) {
-      return res.status(404).json({ error: "Section not found" });
-    }
-
-    // Add the sectionId to the sections array
-    project.sections.push(sectionId);
-    await project.save();
-
-    res.status(200).json({ message: "Section added successfully", project });
-  } catch (error) {
-    console.error("Error adding section to project:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-export const deleteSectionFromProject = async (req, res) => {
-  const { projectId, sectionId } = req.params;
-
-  if (!projectId || !sectionId) {
-    return res
-      .status(400)
-      .json({ error: "projectId and sectionId are required" });
-  }
-
-  try {
-    const project = await Project.findById(projectId);
-
-    if (!project) {
-      return res.status(404).json({ error: "Project not found" });
-    }
-
-    // Check if the sectionId exists in the project's sections array
-    const sectionIndex = project.sections.indexOf(sectionId);
-    if (sectionIndex === -1) {
-      return res.status(404).json({ error: "Section not found in project" });
-    }
-
-    // Remove the sectionId from the sections array
-    project.sections.splice(sectionIndex, 1);
-    await project.save();
-
-    res.status(200).json({ message: "Section removed successfully", project });
-  } catch (error) {
-    console.error("Error removing section from project:", error);
-    res.status(500).json({ error: error.message });
   }
 };
 

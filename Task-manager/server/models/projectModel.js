@@ -6,7 +6,6 @@ const projectSchema = new mongoose.Schema(
     members: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],
-    sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     subProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }], // For subprojects
   },
   { timestamps: true }

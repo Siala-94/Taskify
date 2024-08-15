@@ -174,7 +174,6 @@ export default function Content(props) {
       <div className="card mt-5 ml-5 flex flex-col gap-5  w-full items-stretch">
         <SectionName name={props.section} />
         <Tasks tasks={tasks} setTasks={setTasks} />
-
         {isPressed ? (
           <ExpandedTaskAdder
             handleSetTasks={handleSetTasks}

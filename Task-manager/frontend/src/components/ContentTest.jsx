@@ -1,103 +1,108 @@
-import React from "react";
+import React, { useState } from "react";
 import Divider from "./Divider.jsx";
 import Modal from "../atomic/Modal.jsx";
 import TestModal from "./TestModal.jsx";
+import CalendarIcon from "../assets/icons/CalendarIcon.jsx";
+import ChevronDownIcon from "../assets/icons/ChevronDownIcon.jsx";
+import ChevronRightIcon from "../assets/icons/ChevronRightIcon.jsx";
+import AddProjectModal from "./AddProjectModal.jsx";
 
-function Task(props) {
+const SubTask = (props) => {
   return (
     <>
-      <label htmlFor="my_modal_7">
-        <h2>task</h2>
-        <p>description</p>
-      </label>
-
-      {/* Put this part before </body> tag */}
-      <input type="checkbox" id="my_modal_7" className="modal-toggle" />
-      <div className="modal" role="dialog">
-        <div className="modal-box">
-          <h3 className="text-lg font-bold">Hello!</h3>
-          <p className="py-4">This modal works with a hidden checkbox!</p>
+      <div className="border-base-300 ml-10 mr-10 flex justify-between pl-10">
+        <div className="flex flex-row">
+          <span className="badge text-xs">9</span>
+          <input className="checkbox ml-2"></input>
+          <div className="flex flex-col ml-2">
+            <span>{props.taskName ? props.taskName : "task"}</span>
+            <span className="text-xs">
+              {props.description ? props.description : "description"}
+            </span>
+          </div>
+          <div className="flex flex-row ml-10">
+            <span className="badge text-xs flex items-center">
+              <CalendarIcon />
+              <span className="ml-1">{props.date ? props.date : "date"}</span>
+            </span>
+            <span className="badge text-xs ml-2">
+              {props.assignedTo ? props.assignedTo : "assignedTo"}
+            </span>
+            <span className="badge text-xs ml-2">
+              {props.priority ? props.priority : "p!"}
+            </span>
+          </div>
         </div>
-        <label className="modal-backdrop" htmlFor="my_modal_7">
-          Close
-        </label>
+        <span className="justify-items-end bg-base-200">time</span>
       </div>
+      <Divider />
     </>
   );
-}
+};
 
-function ProjectContent(props) {
+const Task = (props) => {
   return (
     <>
-      <div className="flex-col w-4/5 border-neutral ">
-        <h1 className="text-5xl text-left mt-3 mb-3 ml-3"> inbox</h1>
-        <button className="btn btn-wide "> t</button>
-        <div className="card flex-row">
-          <TestModal />
+      <div className="border-base-300 ml-10 mr-10 flex justify-between">
+        <div className="flex flex-row">
+          <span className="badge text-xs">9</span>
+          <input className="checkbox ml-2"></input>
+          <div className="flex flex-col ml-2">
+            <span>{props.taskName ? props.taskName : "task"}</span>
+            <span className="text-xs">
+              {props.description ? props.description : "description"}
+            </span>
+          </div>
+          <div className="flex flex-row ml-10">
+            <span className="badge text-xs flex items-center">
+              <CalendarIcon />
+              <span className="ml-1">{props.date ? props.date : "date"}</span>
+            </span>
+            <span className="badge text-xs ml-2">
+              {props.assignedTo ? props.assignedTo : "assignedTo"}
+            </span>
+            <span className="badge text-xs ml-2">
+              {props.priority ? props.priority : "p!"}
+            </span>
+          </div>
         </div>
+        <span className="justify-items-end bg-base-200">time</span>
       </div>
+      <Divider />
     </>
   );
-}
+};
 
-function TaskContent(props) {
+const ContentTest = ({ user, project }) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className="card bg-neutral  rounded w-3/5">
-        <Divider text="section" />
-        <Task
-          name="task"
-          description="testing out this task"
-          labels={["new", "old"]}
-          assigned
-          to="Hassan"
-        />
-        <Task
-          name="task"
-          description="testing out this task"
-          labels={["new", "old"]}
-          assigned
-          to="Hassan"
-        />
-        <Task
-          name="task"
-          description="testing out this task"
-          labels={["new", "old"]}
-          assigned
-          to="Hassan"
-        />
-        <div className="card flex flex-row">
-          <Modal text="add task" />
+      <div className="flex flex-col w-1/3">
+        <div className="text-6xl ml-10">
+          {project.name ? project.name : project}
         </div>
-        <Divider text="section" />
-        <Task
-          name="task"
-          description="testing out this task"
-          labels={["new", "old"]}
-          assigned
-          to="Hassan"
-        />
-        <Task
-          name="task"
-          description="testing out this task"
-          labels={["new", "old"]}
-          assigned
-          to="Hassan"
-        />
-        <div className="card flex flex-row">
-          <Modal text="add task" />
+        <div>group by</div>
+        <div>sort by</div>
+        <div className="ml-10 mt-4">
+          <button
+            onClick={() => {
+              setIsOpen(!isOpen);
+            }}
+          >
+            {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
+          </button>
+          <div className="ml-4">
+            <Task />
+            {isOpen && (
+              <div className="ml-4">
+                <SubTask />
+                <SubTask />
+                <SubTask />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </>
-  );
-}
-
-const ContentTest = () => {
-  return (
-    <>
-      <ProjectContent />
-
-      <TaskContent taskID={[1, 2, 3]} />
     </>
   );
 };

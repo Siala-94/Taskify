@@ -26,7 +26,7 @@ const Project = ({ user, project, handlerFunction, reload }) => {
             <summary
               className="hover:bg-base-300"
               onClick={() => {
-                handlerFunction(pl.name);
+                handlerFunction(pl);
               }}
             >
               <div className="flex  ">
@@ -107,8 +107,8 @@ const ApplicationPage = ({ user }) => {
     fetchProjects();
   }, [user]);
 
-  const handleSetProject = (projectName) => {
-    setProject(projectName);
+  const handleSetProject = (project) => {
+    setProject(project);
   };
 
   const handleLinkClick = () => {
@@ -183,9 +183,9 @@ const ApplicationPage = ({ user }) => {
           </li>
         </ul>
       </div>
-      <div className="card flex-row w-full">
-        <Content section={project ? project : "inbox"} />
-      </div>
+
+      {/* <Content user={user} section={project ? project : "inbox"} /> */}
+      <ContentTest user={user} project={project} />
     </div>
   );
 };

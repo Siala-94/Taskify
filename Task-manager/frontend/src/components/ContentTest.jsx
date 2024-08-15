@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Divider from "./Divider.jsx";
 import Modal from "../atomic/Modal.jsx";
 import TestModal from "./TestModal.jsx";
@@ -49,7 +49,7 @@ const Task = (props) => {
           <input className="checkbox ml-2"></input>
           <div className="flex flex-col ml-2">
             <span>{props.taskName ? props.taskName : "task"}</span>
-            <span className="text-xs">
+            <span className="text-sm">
               {props.description ? props.description : "description"}
             </span>
           </div>
@@ -68,13 +68,14 @@ const Task = (props) => {
         </div>
         <span className="justify-items-end bg-base-200">time</span>
       </div>
-      <Divider />
     </>
   );
 };
 
 const ContentTest = ({ user, project }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [taskList, setTaskList] = useState([]);
+
   return (
     <>
       <div className="flex flex-col w-1/3">
@@ -93,13 +94,7 @@ const ContentTest = ({ user, project }) => {
           </button>
           <div className="ml-4">
             <Task />
-            {isOpen && (
-              <div className="ml-4">
-                <SubTask />
-                <SubTask />
-                <SubTask />
-              </div>
-            )}
+            {isOpen && <div className="ml-4"></div>}
           </div>
         </div>
       </div>

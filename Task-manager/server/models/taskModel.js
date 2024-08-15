@@ -21,17 +21,19 @@ const taskSchema = new mongoose.Schema(
     sections: { type: [String], required: true },
     assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [commentSchema],
+    subTask: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
     members: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],
     project: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
-      required: true,
     },
     timeSpentOnTask: { type: Number, default: 0 }, // time in seconds
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Task", taskSchema);
+const Task = mongoose.model("Task", taskSchema);
+
+export default Task;

@@ -70,6 +70,11 @@ export const removeProject = async (req, res) => {
       { $pull: { projects: projectId } } // Remove the project _id from their projects array
     );
 
+    await Project.updateOne(
+      { _id: { $in: project.members } }, // Find users whose _id is in the members array
+      { $pull: { subProjects: projectId } }
+    );
+
     res
       .status(200)
       .json({ message: "Project and its subprojects removed successfully" });

@@ -17,7 +17,7 @@ const taskSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: { type: String },
     dueDate: { type: Date },
-    priority: { type: String, enum: ["1", "2", "3", "4", "5"] },
+    priority: { type: String, enum: ["p1", "p2", "p3", "p4"] },
     sections: { type: [String], required: true },
     assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [commentSchema],

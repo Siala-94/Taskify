@@ -55,7 +55,7 @@ const Project = ({ user, project, handlerFunction, reload }) => {
 };
 
 const ApplicationPage = ({ user }) => {
-  const [project, setProject] = useState("");
+  const [project, setProject] = useState("inbox");
   const [projectList, setProjectList] = useState([]);
   const navigate = useNavigate();
 

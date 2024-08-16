@@ -21,11 +21,13 @@ export const addSubTask = async (req, res) => {
     console.log(newSubTask);
     const savedSubTask = await newSubTask.save();
     console.log("success");
+    console.log(parentID);
     const parentTask = await Task.findByIdAndUpdate(
       parentID,
       { $push: { subTask: savedSubTask._id } },
       { new: true }
     );
+    console.log("found parentTask", parentTask);
 
     if (!parentTask) {
       return res.status(404).json({ message: "Parent task not found" });

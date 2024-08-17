@@ -36,6 +36,26 @@ export const getUserById = async (req, res) => {
   }
 };
 
+export const getUserByOID = async (req, res) => {
+  console.log("Request parameters:", req.params);
+  const { uid } = req.params;
+
+  if (!uid) {
+    return res.status(400).json({ error: "uid is required" });
+  }
+
+  try {
+    const user = await User.findOne({ _id: uid });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user); // Sending JSON response
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+    res.status(500).json({ error: error.message }); // Sending JSON error response
+  }
+};
+
 export const getUserByEmail = async (req, res) => {
   console.log("Request parameters:", req.params);
   const { email } = req.params;

@@ -9,23 +9,25 @@ To achieve this, some functionality goals are outlined, that the project aims to
 - adding tasks [check]
   - add tasks within tasks [check]
   - set due date [check]
-  - assign tasks [check]
+  - assign tasks [] v
   - time tracking tasks []
-  - possibility to post comments under tasks []
+  - possibility to post comments under tasks [] v
   - adding priority levels [check]
 - creating projects
   - create project within project (nested projects) [check]
-  - invite team members to projects []
-  - add sections to projects []
-  - possibility to group tasks by filter, priority or sections []
+  - invite team members to projects [] v
+  - add sections to projects [] v
+  - possibility to group tasks by filter, priority or sections [] v
 - other
-  - connect to google calendar
-  - sign in using google
+
+  - create and sign up via email & password [check]
 
 ## if time
 
-- nlp functionality to describe what you want to do in task description []
-- add filters []
+- sign in using google
+- nlp functionality to describe what you want to do in task description
+- add filters
+- connect to google calendar
 
 ## Technical stack
 

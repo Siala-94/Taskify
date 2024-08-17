@@ -35,7 +35,7 @@ const AddProjectModal = ({ user, reload }) => {
         name: projectName,
         members: members,
       });
-      console.log("res", res);
+
       setIsOpen(false); // Close the modal after submission
       setProjectName(""); // Reset the project name input
       reload(); // Call the reload function to refresh the project list

@@ -83,10 +83,10 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
             setPriority(e.target.value);
           }}
         >
-          <option>p1</option>
-          <option>p2</option>
-          <option>p3</option>
-          <option selected>p4</option>
+          <option value="p1">p1</option>
+          <option value="p2">p2</option>
+          <option value="p3">p3</option>
+          <option value="p4">p4</option>
         </select>
       </div>
 

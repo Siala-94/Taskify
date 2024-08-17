@@ -6,7 +6,7 @@ export default function ChevronDownIcon(params) {
       viewBox="0 0 24 24"
       strokeWidth="1.5"
       stroke="currentColor"
-      class="w-3 h-3"
+      className="w-3 h-3"
     >
       <path
         strokeLinecap="round"

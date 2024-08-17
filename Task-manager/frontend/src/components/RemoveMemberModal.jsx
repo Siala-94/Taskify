@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+
 import TrashIcon from "../assets/icons/TrashIcon";
 
 const Modal = ({ isOpen, onClose, children }) => {
@@ -21,20 +21,23 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const RemoveProjectModal = ({ projectID, reload }) => {
+const RemoveMemberModal = ({ projectID, memberID, reload, eHandle }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const URL = "http://localhost:3000";
 
-  const handleRemoveProject = async (e) => {
+  const handleRemoveMember = async (e) => {
     e.preventDefault();
 
     try {
       console.log(projectID);
-      const res = await axios.delete(`${URL}/project/delete/${projectID}`);
-      console.log(res);
+      const res = await axios.put(`${URL}/project/delete/member`, {
+        projectId: projectID,
+        memberId: memberID,
+      });
       setIsOpen(false); // Close the modal after submission
       reload();
+      eHandle();
     } catch (error) {
       console.error(error);
     }
@@ -56,8 +59,10 @@ const RemoveProjectModal = ({ projectID, reload }) => {
           setIsOpen(false);
         }}
       >
-        <form className="card-body" onSubmit={handleRemoveProject}>
-          <div className="form-control">Are you sure you want to delete?</div>
+        <form className="card-body" onSubmit={handleRemoveMember}>
+          <div className="form-control">
+            Are you sure you want to remove this member?
+          </div>
           <div className="hero flex justify-end mt-4">
             <button className="btn bg-base-100 ml-6" type="submit">
               delete
@@ -69,4 +74,4 @@ const RemoveProjectModal = ({ projectID, reload }) => {
   );
 };
 
-export default RemoveProjectModal;
+export default RemoveMemberModal;

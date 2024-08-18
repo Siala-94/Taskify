@@ -7,12 +7,7 @@ import {
   getTasksWithNoProjectID,
   getTaskByTaskID,
   putComment,
-  putPriority,
-  putDueDate,
-  putAssignedTo,
-  changeProject,
-  changeName,
-  changeDescription,
+  updateTask,
 } from "../controllers/taskController.js";
 
 const router = express.Router();
@@ -24,11 +19,6 @@ router.get("/get/allTasks/:projectID", getTasksByProjectID);
 router.get("/get/inbox/:userID", getTasksWithNoProjectID);
 router.get("/get/taskByTaskID/:taskID", getTaskByTaskID);
 router.put("/put/comment/:taskID", putComment);
-router.put("/put/priority/:taskID", putPriority);
-router.put("/put/dueDate/:taskID", putDueDate);
-router.put("/put/assignedTo/:taskID", putAssignedTo);
-router.put("/put/changeProject/:taskID", changeProject);
-router.put("/put/changeTaskName/:taskID", changeName);
-router.put("/put/changeTaskDescription/:taskID", changeDescription);
+router.put("/put/task/:taskID", updateTask);
 
 export default router;

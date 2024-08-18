@@ -2,6 +2,7 @@ import React from "react";
 import InboxIcon from "../assets/icons/InboxIcon";
 import TodayIcon from "../assets/icons/TodayIcon";
 import CalendarIcon from "../assets/icons/CalendarIcon";
+
 const LeftMenu = ({ handlerFunction }) => {
   return (
     <ul className="menu bg-base-300 w-full rounded-box">

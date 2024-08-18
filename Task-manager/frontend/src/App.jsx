@@ -35,7 +35,7 @@ const App = () => {
         />
         <Route path="/register" element={<RegisterPage />} />
         <Route
-          path="/application"
+          path="/application/*"
           element={user ? <ApplicationPage user={user} /> : <LandingPage />}
         ></Route>
       </Routes>

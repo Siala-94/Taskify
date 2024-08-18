@@ -7,96 +7,87 @@ import ChevronRightIcon from "../assets/icons/ChevronRightIcon.jsx";
 import AddTaskModal from "./AddTaskModal.jsx";
 import AddSubTaskModal from "./AddSubTaskModal.jsx";
 import AddMemberModal from "./AddMemberModal.jsx";
-import TrashIcon from "../assets/icons/TrashIcon.jsx";
 import RemoveMemberModal from "./RemoveMemberModal.jsx";
+import TaskContent, { Task } from "./TaskContent.jsx";
 
-const Task = ({ task, reload, user, project }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
-    const year = date.getFullYear().toString().slice(-2);
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}:${month}:${day}`;
-  };
-
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:3000/task/delete/${task._id}`);
-      console.log(`Task ${task._id} deleted successfully`);
-      reload();
-    } catch (error) {
-      console.error(`Error deleting task ${task._id}:`, error);
-    }
-  };
-
+const HeaderContent = ({
+  project,
+  setMembersButton,
+  handleReload,
+  membersButton,
+  membersList,
+}) => {
   return (
-    <li>
-      <div className="ml-5 mr-10 flex justify-">
-        <div className="flex bg-base-300/20 flex-row items-center border rounded-full border-neutral mt-2">
-          <AddSubTaskModal
-            user={user}
-            project={project}
-            reload={reload}
-            parentTaskID={task._id}
-          />
-          <button
-            className="btn btn-xs bg-base-100 border border-base-100 hover:bg-base-100 hover:text-primary hover:border-base-100"
-            onClick={handleToggle}
-          >
-            {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
-          </button>
-          <button className="flex mt-2">
-            <input
-              className="checkbox ml-2"
-              type="checkbox"
-              onChange={handleDelete}
-            />
-          </button>
-          <div className="flex flex-col ml-2">
-            <span>{task.name}</span>
-            <span className="text-xs w-36 overflow-hidden text-ellipsis whitespace-nowrap">
-              {task.description}
-            </span>
-          </div>
-          <div className="flex flex-row ml-10">
-            <span className="badge text-xs flex items-center">
-              <CalendarIcon />
-              <span className="ml-1">{formatDate(task.dueDate)}</span>
-            </span>
-            <span className="badge text-xs ml-2">{task.assignedTo}</span>
-            <span className="badge text-xs ml-2">{task.priority}</span>
-          </div>
-        </div>
+    <div className="flex flex-row justify-between items-center">
+      <div className="text-6xl ml-10">
+        {project.name ? project.name : project}
       </div>
-
-      {isOpen && task.subTask && task.subTask.length > 0 && (
-        <ul className="ml-6">
-          {task.subTasks.map((subtask) => (
-            <Task
-              key={subtask._id}
-              task={subtask}
-              reload={reload}
-              user={user}
+      <div className="mr-10">
+        <button
+          className="btn btn-xs bg-warning text-primary-content hover:bg-warning hover:text-primary-content items-center"
+          onClick={() => {
+            setMembersButton(!membersButton);
+          }}
+        >
+          Members
+        </button>
+        {membersButton && (
+          <div className="card gap-3 bg-base-300 -ml-10 w-32">
+            <AddMemberModal
               project={project}
+              reload={handleReload}
+              eHandle={setMembersButton}
             />
-          ))}
-        </ul>
-      )}
-    </li>
+
+            {membersList.map((member) => (
+              <div key={member._id} className="flex flex-row">
+                <RemoveMemberModal
+                  projectID={project._id}
+                  memberID={member._id}
+                  reload={handleReload}
+                  eHandle={setMembersButton}
+                />
+
+                <div className="w-32 overflow-hidden text-ellipsis whitespace-nowrap">
+                  {member.email}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
-const ContentTest = ({ user, project, reloadProject }) => {
+const CurrentTaskContent = ({
+  user,
+  project,
+  handleTaskSelection,
+  currentTask,
+  fetchTasks,
+}) => {
+  return (
+    <>
+      {currentTask && (
+        <>
+          <div className="card-content w-full flex flex-row">
+            <textarea
+              className="textarea w-full textarea-primary justify-end"
+              placeholder="write a comment"
+            ></textarea>
+          </div>
+        </>
+      )}
+    </>
+  );
+};
+
+const ContentTest = ({ user, project }) => {
   const [taskList, setTaskList] = useState([]);
   const [membersList, setMembersList] = useState([]);
   const [membersButton, setMembersButton] = useState(false);
+  const [currentTask, setCurrentTask] = useState(null);
 
   const populateTaskList = (tasks) => {
     const taskMap = new Map();
@@ -143,14 +134,11 @@ const ContentTest = ({ user, project, reloadProject }) => {
       const temp = [];
 
       for (const member of project.members) {
-        console.log("Fetching data for member ID:", member);
         const res = await axios.get(`http://localhost:3000/ouid/${member}`);
-        console.log("Data received for member:", res.data);
         temp.push(res.data);
       }
 
       setMembersList(temp);
-      console.log("Final members list:", temp); // Check what members are being set
     } catch (error) {
       console.error("Error fetching members data:", error);
     }
@@ -160,75 +148,53 @@ const ContentTest = ({ user, project, reloadProject }) => {
     if (project._id) {
       fetchTasks();
       fetchMembersData();
+      setCurrentTask();
     }
   }, [project]);
 
   const handleReload = async () => {
-    console.log("Reloading members...");
     await fetchMembersData();
-    console.log("Members reloaded:", membersList);
+  };
+
+  const handleTaskSelection = (task) => {
+    setCurrentTask(task);
   };
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-row justify-between items-center">
-        <div className="text-6xl ml-10">
-          {project.name ? project.name : project}
-        </div>
-        <div className="mr-10">
-          <button
-            className="btn btn-xs items-center"
-            onClick={() => {
-              setMembersButton(!membersButton);
-            }}
-          >
-            members
-          </button>
-          {membersButton && (
-            <div className=" bg-base-300 -ml-10  w-32">
-              <AddMemberModal
-                project={project}
-                reload={handleReload}
-                eHandle={setMembersButton}
-              />
-
-              {membersList.map((member) => (
-                <div key={member._id} className="flex flex-row">
-                  <RemoveMemberModal
-                    projectID={project._id}
-                    memberID={member._id}
-                    reload={handleReload}
-                    eHandle={setMembersButton}
-                  />
-
-                  <div className=" w-32 overflow-hidden text-ellipsis whitespace-nowrap">
-                    {member.email}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      <HeaderContent
+        project={project}
+        setMembersButton={setMembersButton}
+        handleReload={handleReload}
+        membersButton={membersButton}
+        membersList={membersList}
+      />
 
       <Divider />
 
-      <div className="w-1/3">
-        <AddTaskModal user={user} project={project} reload={fetchTasks} />
-      </div>
+      <AddTaskModal user={user} project={project} reload={fetchTasks} />
 
-      <div className="mt-4 w-full">
-        <ul>
-          {taskList.map((task) => (
-            <Task
-              key={task._id}
-              task={task}
-              reload={fetchTasks}
+      <div className="mt-4 flex h-4/5 flex-row w-full">
+        <div className="w-full">
+          <TaskContent
+            taskList={taskList}
+            fetchTasks={fetchTasks}
+            user={user}
+            project={project}
+            handleTaskSelection={handleTaskSelection}
+          />
+        </div>
+        {currentTask && (
+          <div className="card w-full  shadow-lg shadow-base-300 mr-2 ml-36 p-4">
+            <CurrentTaskContent
               user={user}
+              fetchTasks={fetchTasks}
               project={project}
-            />
-          ))}
-        </ul>
+              handleTaskSelection={handleTaskSelection}
+              currentTask={currentTask}
+            />{" "}
+          </div>
+        )}
       </div>
     </div>
   );

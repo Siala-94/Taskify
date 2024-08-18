@@ -3,7 +3,7 @@ import PlusIcon from "../assets/icons/PlusIcon";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const AddTaskForm = ({ eHandler, project, reload }) => {
+const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState();
@@ -23,8 +23,11 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
     };
 
     try {
-      const res = await axios.post("http://localhost:3000/task/add", taskData);
-      console.log("Task added:", res.data);
+      const res = await axios.put(
+        `http://localhost:3000/task/put/task/${taskID}`,
+        taskData
+      );
+      console.log("Task updated:", res.data);
 
       // Reset states after successful submission
       setTaskName("");
@@ -141,38 +144,31 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const AddTaskModal = ({ user, project, reload }) => {
+const EditTaskModal = ({ taskID, project, reload }) => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const URL = "http://localhost:3000";
-
-  const handleNewProject = async (e) => {
-    e.preventDefault();
-    const members = [user._id];
-    try {
-      const res = await axios.post(`${URL}/task/add`, {
-        name: taskName,
-        members: members,
-      });
-
-      setIsOpen(false); // Close the modal after submission
-      setTaskName(""); // Reset the project name input
-      reload(); // Call the reload function to refresh the project list
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <>
       <button
-        className="btn ml-7 justify-start btn-xs bg-base-100 border-base-100 hover:bg-base-100 hover:border-base-100 hover:text-primary"
+        className="btn justify-start btn-xs bg-base-100 border-base-100 hover:bg-base-100 hover:border-base-100 hover:text-primary"
         onClick={() => {
           setIsOpen(true);
         }}
       >
-        <PlusIcon />
-        add task
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          class="size-4"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+          />
+        </svg>
       </button>
       <Modal
         isOpen={isOpen}
@@ -180,10 +176,15 @@ const AddTaskModal = ({ user, project, reload }) => {
           setIsOpen(false);
         }}
       >
-        <AddTaskForm eHandler={setIsOpen} project={project} reload={reload} />
+        <EditTaskForm
+          taskID={taskID}
+          eHandler={setIsOpen}
+          project={project}
+          reload={reload}
+        />
       </Modal>
     </>
   );
 };
 
-export default AddTaskModal;
+export default EditTaskModal;

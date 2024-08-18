@@ -150,129 +150,21 @@ export const putComment = async (req, res) => {
   }
 };
 
-// Put priority
-export const putPriority = async (req, res) => {
-  const taskID = req.params.taskID;
-  const { priority } = req.body;
+export const updateTask = async (req, res) => {
+  const taskID = req.params.taskID; // Extract taskID from the request parameters
+  const updateData = req.body; // Get all the update data from the request body
+
   try {
-    const task = await Task.findByIdAndUpdate(
-      taskID,
-      { priority: priority },
-      { new: true }
-    );
+    // Find the task by ID and update it with the new data
+    const task = await Task.findByIdAndUpdate(taskID, updateData, {
+      new: true, // Return the updated document
+      runValidators: true, // Run validation on the updated data
+    });
+
     if (!task) {
       return res.status(404).json({ error: "Task not found" });
     }
-    res.status(200).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 
-// Put due date
-export const putDueDate = async (req, res) => {
-  const taskID = req.params.taskID;
-  const { date } = req.body;
-  try {
-    const task = await Task.findByIdAndUpdate(
-      taskID,
-      { dueDate: date },
-      { new: true }
-    );
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    res.status(200).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Put assignedTo
-export const putAssignedTo = async (req, res) => {
-  const { user } = req.body;
-  const taskID = req.params.taskID;
-  try {
-    const task = await Task.findById(taskID);
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    task.assignedTo = user;
-    await task.save();
-    res.status(200).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// // Put timeSpentOnTask
-// export const putTimeSpentOnTask = async (req, res) => {
-//   try {
-//     const task = await Task.findByIdAndUpdate(
-//       req.params.id,
-//       { timeSpentOnTask: req.body.timeSpentOnTask },
-//       { new: true }
-//     );
-//     if (!task) {
-//       return res.status(404).json({ error: "Task not found" });
-//     }
-//     res.status(200).json(task);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
-
-// Change project
-export const changeProject = async (req, res) => {
-  const { projectID } = req.body;
-  const taskID = req.params.taskID;
-  try {
-    const task = await Task.findByIdAndUpdate(
-      taskID,
-      { project: projectID },
-      { new: true }
-    );
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    res.status(200).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Change name
-export const changeName = async (req, res) => {
-  const { name } = req.body;
-  const taskID = req.params.taskID;
-  try {
-    const task = await Task.findByIdAndUpdate(
-      taskID,
-      { name: name },
-      { new: true }
-    );
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
-    res.status(200).json(task);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// Change description
-export const changeDescription = async (req, res) => {
-  const { description } = req.body;
-  const taskID = req.params.taskID;
-  try {
-    const task = await Task.findByIdAndUpdate(
-      taskID,
-      { description: description },
-      { new: true }
-    );
-    if (!task) {
-      return res.status(404).json({ error: "Task not found" });
-    }
     res.status(200).json(task);
   } catch (error) {
     res.status(400).json({ error: error.message });

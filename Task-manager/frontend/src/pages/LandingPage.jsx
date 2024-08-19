@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
-import Logo from "../atomic/Logo.jsx";
+import Logo from "../components/Logo.jsx";
 
 const LandingPage = () => {
   const [email, setEmail] = useState("");
@@ -19,11 +19,12 @@ const LandingPage = () => {
       );
       const user = userCredential.user;
       console.log("successfully signed in", user);
-      alert("switching route");
+
       navigate("/");
     } catch (error) {
+      alert(error.code, error.message);
       console.log(error.code, error.message);
-      alert(error.message);
+
       error.message === "Firebase: Error (auth/invalid-credential)."
         ? alert("wrong username or password")
         : console.log(error.message);
@@ -79,7 +80,7 @@ const LandingPage = () => {
                 </button>
               </div>
               <p>
-                don't have an account?
+                Don't have an account?{" "}
                 <Link to="/register" className="link">
                   Register now
                 </Link>

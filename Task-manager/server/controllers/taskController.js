@@ -102,13 +102,12 @@ export const getTasksByProjectID = async (req, res) => {
   }
 };
 
-// Get all tasks with no projectID for a specific user
 export const getTasksWithNoProjectID = async (req, res) => {
   const userID = req.params.userID; // Assuming the user ID is passed as a URL parameter
 
   try {
     const tasks = await Task.find({
-      project: { $exists: false },
+      project: null, // Check for tasks where the project field is explicitly null
       members: userID,
     });
 
@@ -166,6 +165,47 @@ export const updateTask = async (req, res) => {
     }
 
     res.status(200).json(task);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getTasksWithDueDate = async (req, res) => {
+  const userID = req.params.userID;
+
+  try {
+    // Find tasks that have a due date and where the user is a member
+    const tasks = await Task.find({
+      dueDate: { $exists: true, $ne: null }, // Task has a due date
+      members: userID, // User is a member of the task
+    });
+
+    // Return the tasks
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getTasksWithDueDateToday = async (req, res) => {
+  const userID = req.params.userID;
+
+  try {
+    // Get today's date at midnight and the start of the next day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(24, 0, 0, 0);
+
+    // Find tasks that have a due date today and where the user is a member
+    const tasks = await Task.find({
+      dueDate: { $gte: startOfDay, $lt: endOfDay }, // Task due date is today
+      members: userID, // User is a member of the task
+    });
+
+    // Return the tasks
+    res.status(200).json(tasks);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

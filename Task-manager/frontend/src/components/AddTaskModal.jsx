@@ -1,15 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PlusIcon from "../assets/icons/PlusIcon";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const AddTaskForm = ({ eHandler, project, reload }) => {
+const AddTaskForm = ({ user, eHandler, project, reload }) => {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState();
+  const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState("p4");
-  const [assignedTo, setAssignedTo] = useState("");
-  const members = project.members;
+  const [selectedProject, setSelectedProject] = useState(project?._id || "");
+  const [listOfProject, setListOfProjects] = useState([]);
+
+  useEffect(() => {
+    if (project) {
+      setSelectedProject(project._id || "");
+    } else {
+      setSelectedProject(""); // or set to a default value like "Inbox"
+    }
+  }, [project]);
+
+  useEffect(() => {
+    const populateListOfProjects = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/project/get/${user._id}`
+        );
+        setListOfProjects(res.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    populateListOfProjects();
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const taskData = {
@@ -17,9 +39,9 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
       description: description,
       dueDate: dueDate,
       priority: priority,
-      assignedTo: [],
       comments: [],
-      project: project._id,
+      project: selectedProject === "Inbox" ? null : selectedProject,
+      members: project?.members ? project.members : [user._id], // Handle undefined project
     };
 
     try {
@@ -31,7 +53,7 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
       setDescription("");
       setDueDate("");
       setPriority("p4");
-      setAssignedTo("");
+      setSelectedProject(project?._id || "");
 
       // Close the modal
       eHandler(false);
@@ -42,6 +64,7 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
       console.error("Error adding task:", error);
     }
   };
+
   return (
     <form className="card-body" onSubmit={handleSubmit}>
       <div className="form-control">
@@ -93,17 +116,24 @@ const AddTaskForm = ({ eHandler, project, reload }) => {
       </div>
 
       <div className="form-control">
-        assign task to
+        choose project
         <select
           className="select input-bordered"
-          placeholder="assign task to"
-          value={assignedTo}
+          value={selectedProject}
           onChange={(e) => {
-            setAssignedTo(e.target.value);
+            setSelectedProject(e.target.value);
           }}
         >
-          <option selected default></option>
-          <option>hassan</option>
+          {/* Default selected project */}
+          {project && <option value={project._id}>{project.name}</option>}
+          <option value="Inbox">Inbox</option>
+          {listOfProject
+            .filter((lp) => lp._id !== project?._id) // Filter out the current project
+            .map((lp) => (
+              <option key={lp._id} value={lp._id}>
+                {lp.name}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -144,25 +174,6 @@ const Modal = ({ isOpen, onClose, children }) => {
 const AddTaskModal = ({ user, project, reload }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const URL = "http://localhost:3000";
-
-  const handleNewProject = async (e) => {
-    e.preventDefault();
-    const members = [user._id];
-    try {
-      const res = await axios.post(`${URL}/task/add`, {
-        name: taskName,
-        members: members,
-      });
-
-      setIsOpen(false); // Close the modal after submission
-      setTaskName(""); // Reset the project name input
-      reload(); // Call the reload function to refresh the project list
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <>
       <button
@@ -180,7 +191,12 @@ const AddTaskModal = ({ user, project, reload }) => {
           setIsOpen(false);
         }}
       >
-        <AddTaskForm eHandler={setIsOpen} project={project} reload={reload} />
+        <AddTaskForm
+          user={user}
+          eHandler={setIsOpen}
+          project={project}
+          reload={reload}
+        />
       </Modal>
     </>
   );

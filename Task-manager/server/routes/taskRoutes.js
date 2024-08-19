@@ -8,6 +8,8 @@ import {
   getTaskByTaskID,
   putComment,
   updateTask,
+  getTasksWithDueDate,
+  getTasksWithDueDateToday,
 } from "../controllers/taskController.js";
 
 const router = express.Router();
@@ -20,5 +22,6 @@ router.get("/get/inbox/:userID", getTasksWithNoProjectID);
 router.get("/get/taskByTaskID/:taskID", getTaskByTaskID);
 router.put("/put/comment/:taskID", putComment);
 router.put("/put/task/:taskID", updateTask);
-
+router.get("/get/tasksWithDate/:userID", getTasksWithDueDate);
+router.get("/get/tasksWithTodayDate/:userID", getTasksWithDueDateToday);
 export default router;

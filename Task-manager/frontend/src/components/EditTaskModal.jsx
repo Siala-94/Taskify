@@ -1,25 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PlusIcon from "../assets/icons/PlusIcon";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
-  const [taskName, setTaskName] = useState("");
-  const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState();
-  const [priority, setPriority] = useState("p4");
-  const [assignedTo, setAssignedTo] = useState("");
-  const members = project.members;
+const EditTaskForm = ({
+  currentTask,
+  user,
+  taskID,
+  eHandler,
+  project,
+  reload,
+}) => {
+  const [taskName, setTaskName] = useState(currentTask.name);
+  const [description, setDescription] = useState(currentTask.description);
+  const [dueDate, setDueDate] = useState(currentTask.dueDate);
+  const [priority, setPriority] = useState(currentTask.priority);
+  const [selectedProject, setSelectedProject] = useState(project?._id || "");
+  const [listOfProject, setListOfProjects] = useState([]);
+
+  useEffect(() => {
+    if (project) {
+      setSelectedProject(project._id || "");
+    } else {
+      setSelectedProject(""); // or set to a default value like "Inbox"
+    }
+  }, [project]);
+
+  useEffect(() => {
+    const populateListOfProjects = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/project/get/${user._id}`
+        );
+        setListOfProjects(res.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    populateListOfProjects();
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const taskData = {
       name: taskName,
       description: description,
       dueDate: dueDate,
       priority: priority,
-      assignedTo: [],
       comments: [],
-      project: project._id,
+      project: selectedProject === "Inbox" ? null : selectedProject,
+      members: project?.members || [user._id], // Handle undefined project
     };
 
     try {
@@ -34,7 +64,7 @@ const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
       setDescription("");
       setDueDate("");
       setPriority("p4");
-      setAssignedTo("");
+      setSelectedProject(project?._id || "");
 
       // Close the modal
       eHandler(false);
@@ -42,41 +72,36 @@ const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
       // Reload the tasks or data
       reload();
     } catch (error) {
-      console.error("Error adding task:", error);
+      console.error("Error updating task:", error);
     }
   };
+
   return (
     <form className="card-body" onSubmit={handleSubmit}>
       <div className="form-control">
         <input
           className="input input-bordered"
-          placeholder="Task name"
+          placeholder={taskName}
           value={taskName}
-          onChange={(e) => {
-            setTaskName(e.target.value);
-          }}
+          onChange={(e) => setTaskName(e.target.value)}
         />
       </div>
       <div className="form-control">
         <textarea
           className="textarea input-bordered"
-          placeholder="Description"
+          placeholder={description}
           value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
       <div className="form-control">
         <input
-          className="input input-bordered "
+          className="input input-bordered"
           type="date"
-          placeholder="Date"
+          placeholder={dueDate}
           value={dueDate}
-          onChange={(e) => {
-            setDueDate(e.target.value);
-          }}
+          onChange={(e) => setDueDate(e.target.value)}
         />
       </div>
 
@@ -84,9 +109,7 @@ const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
         <select
           className="select input-bordered"
           value={priority}
-          onChange={(e) => {
-            setPriority(e.target.value);
-          }}
+          onChange={(e) => setPriority(e.target.value)}
         >
           <option value="p1">p1</option>
           <option value="p2">p2</option>
@@ -96,20 +119,26 @@ const EditTaskForm = ({ taskID, eHandler, project, reload }) => {
       </div>
 
       <div className="form-control">
-        assign task to
+        choose project
         <select
           className="select input-bordered"
-          placeholder="assign task to"
-          value={assignedTo}
-          onChange={(e) => {
-            setAssignedTo(e.target.value);
-          }}
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
         >
-          <option selected default></option>
-          <option>hassan</option>
+          {/* Default selected project */}
+          <option value={project?._id || ""}>
+            {project?.name || "Select Project"}
+          </option>
+          <option value="Inbox">Inbox</option>
+          {listOfProject
+            .filter((lp) => lp._id !== project?._id) // Handle undefined project
+            .map((lp) => (
+              <option key={lp._id} value={lp._id}>
+                {lp.name}
+              </option>
+            ))}
         </select>
       </div>
-
       <div className="hero flex justify-end mt-4">
         <button
           className="btn bg-base-100"
@@ -144,16 +173,14 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const EditTaskModal = ({ taskID, project, reload }) => {
+const EditTaskModal = ({ currentTask, user, taskID, project, reload }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <button
         className="btn justify-start btn-xs bg-base-100 border-base-100 hover:bg-base-100 hover:border-base-100 hover:text-primary"
-        onClick={() => {
-          setIsOpen(true);
-        }}
+        onClick={() => setIsOpen(true)}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +188,7 @@ const EditTaskModal = ({ taskID, project, reload }) => {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          class="size-4"
+          className="size-4"
         >
           <path
             strokeLinecap="round"
@@ -170,17 +197,14 @@ const EditTaskModal = ({ taskID, project, reload }) => {
           />
         </svg>
       </button>
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-        }}
-      >
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <EditTaskForm
+          user={user}
           taskID={taskID}
           eHandler={setIsOpen}
           project={project}
           reload={reload}
+          currentTask={currentTask}
         />
       </Modal>
     </>

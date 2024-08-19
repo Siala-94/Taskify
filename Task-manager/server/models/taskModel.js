@@ -19,7 +19,7 @@ const taskSchema = new mongoose.Schema(
     dueDate: { type: Date },
     priority: { type: String, enum: ["p1", "p2", "p3", "p4"] },
     sections: { type: [String], required: true },
-    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     comments: [commentSchema],
     subTask: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
     members: [

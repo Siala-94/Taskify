@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AddTaskModal from "./AddTaskModal.jsx";
-import TaskContent, { Task } from "./TaskContent.jsx";
+import TaskContent from "./TaskContent.jsx";
 import CommentContent from "./CommentContent.jsx";
 import HeaderContent from "./HeaderContent.jsx";
 
-const TodayContent = ({ user, project }) => {
+const ProjectContent = ({ user, project }) => {
   const [taskList, setTaskList] = useState([]);
   const [membersList, setMembersList] = useState([]);
   const [membersButton, setMembersButton] = useState(false);
@@ -15,6 +15,7 @@ const TodayContent = ({ user, project }) => {
   const handleSetCommentsIsOpen = (e) => {
     setCommentsIsOpen(e);
   };
+
   const populateTaskList = (tasks) => {
     const taskMap = new Map();
 
@@ -44,9 +45,17 @@ const TodayContent = ({ user, project }) => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/task/get/tasksWithTodayDate/${user._id}`
-      );
+      let response;
+
+      if (project.name === "Inbox") {
+        // If project is "Inbox", fetch tasks or perform a different request
+        response = await axios.get(`http://localhost:3000/ouid/${user._id}`);
+      } else {
+        // Fetch tasks for the selected project
+        response = await axios.get(
+          `http://localhost:3000/task/get/allTasks/${project._id}`
+        );
+      }
 
       const populatedTasks = populateTaskList(response.data);
       setTaskList(populatedTasks);
@@ -55,15 +64,33 @@ const TodayContent = ({ user, project }) => {
     }
   };
 
-  const handleReload = async () => {
-    await fetchTasks();
-    setCurrentTask();
+  const fetchMembersData = async () => {
+    try {
+      const temp = [];
+
+      for (const member of project.members) {
+        const res = await axios.get(`http://localhost:3000/ouid/${member}`);
+        temp.push(res.data);
+      }
+
+      setMembersList(temp);
+    } catch (error) {
+      console.error("Error fetching members data:", error);
+    }
   };
+
+  const handleReload = async () => {
+    await fetchMembersData();
+    await fetchTasks();
+    await fetchMembersData();
+    setCurrentTask(null);
+  };
+
   useEffect(() => {
-    {
+    if (project._id) {
       handleReload();
     }
-  }, []);
+  }, [project]);
 
   const handleTaskSelection = (task) => {
     setCurrentTask(task);
@@ -71,10 +98,17 @@ const TodayContent = ({ user, project }) => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-row justify-between items-center">
-        <div className="text-6xl ml-10">Today</div>
-      </div>
+      <HeaderContent
+        project={project}
+        setMembersButton={setMembersButton}
+        handleReload={handleReload}
+        membersButton={membersButton}
+        membersList={membersList}
+      />
+
       <div className="divider"></div>
+
+      <AddTaskModal user={user} project={project} reload={fetchTasks} />
 
       <div className="mt-4 flex h-4/5 flex-row w-full">
         <div className="w-full">
@@ -104,4 +138,4 @@ const TodayContent = ({ user, project }) => {
   );
 };
 
-export default TodayContent;
+export default ProjectContent;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../atomic/Logo.jsx";
+import Logo from "../components/Logo.jsx";
 import { auth } from "../firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
@@ -83,9 +83,9 @@ const RegisterPage = () => {
                 </button>
               </div>
               <p>
-                Already have an account?
+                Already have an account?{" "}
                 <Link to="/" className="link">
-                  sign in
+                  Sign in
                 </Link>
               </p>
             </form>

@@ -1,37 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PlusIcon from "../assets/icons/PlusIcon";
 import axios from "axios";
 
-const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
+const AddTaskForm = ({ user, eHandler, project, reload, parentTaskID }) => {
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState(new Date());
+  const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState("p4");
-  const [assignedTo, setAssignedTo] = useState("");
-  const members = project.members;
+  const [selectedProject, setSelectedProject] = useState(project?._id || "");
+  const [listOfProject, setListOfProjects] = useState([]);
+
+  useEffect(() => {
+    if (project) {
+      setSelectedProject(project._id || "");
+    } else {
+      setSelectedProject(""); // or set to a default value like "Inbox"
+    }
+  }, [project]);
+
+  useEffect(() => {
+    const populateListOfProjects = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/project/get/${user._id}`
+        );
+        setListOfProjects(res.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    populateListOfProjects();
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let projectId = selectedProject === "Inbox" ? null : selectedProject;
+
     const taskData = {
       name: taskName,
       description: description,
       dueDate: dueDate,
       priority: priority,
-      project: project._id,
+      comments: [],
+      project: projectId,
+      members: project?.members || [user._id], // Handle undefined project
     };
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/task/add/${parentTaskID}`,
+        `http://localhost:3000/task/add/${parentTaskID || ""}`, // Handle undefined parentTaskID
         taskData
       );
-      console.log("sub task added:", res.data);
+      console.log("Sub task added:", res.data);
 
       // Reset states after successful submission
       setTaskName("");
       setDescription("");
-      setDueDate(new Date());
+      setDueDate("");
       setPriority("p4");
-      setAssignedTo("");
 
       // Close the modal
       eHandler(false);
@@ -42,6 +69,7 @@ const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
       console.error("Error adding task:", error);
     }
   };
+
   return (
     <form className="card-body" onSubmit={handleSubmit}>
       <div className="form-control">
@@ -49,9 +77,7 @@ const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
           className="input input-bordered"
           placeholder="Task name"
           value={taskName}
-          onChange={(e) => {
-            setTaskName(e.target.value);
-          }}
+          onChange={(e) => setTaskName(e.target.value)}
         />
       </div>
       <div className="form-control">
@@ -59,9 +85,7 @@ const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
           className="textarea input-bordered"
           placeholder="Description"
           value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
@@ -71,9 +95,7 @@ const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
           type="date"
           placeholder="Date"
           value={dueDate}
-          onChange={(e) => {
-            setDueDate(e.target.value);
-          }}
+          onChange={(e) => setDueDate(e.target.value)}
         />
       </div>
 
@@ -81,29 +103,34 @@ const AddTaskForm = ({ eHandler, project, reload, parentTaskID }) => {
         <select
           className="select input-bordered"
           value={priority}
-          onChange={(e) => {
-            setPriority(e.target.value);
-          }}
+          onChange={(e) => setPriority(e.target.value)}
         >
-          <option>p1</option>
-          <option>p2</option>
-          <option>p3</option>
-          <option selected>p4</option>
+          <option value="p1">p1</option>
+          <option value="p2">p2</option>
+          <option value="p3">p3</option>
+          <option value="p4">p4</option>
         </select>
       </div>
 
       <div className="form-control">
-        assign task to
+        choose project
         <select
           className="select input-bordered"
-          placeholder="assign task to"
-          value={assignedTo}
-          onChange={(e) => {
-            setAssignedTo(e.target.value);
-          }}
+          value={selectedProject}
+          onChange={(e) => setSelectedProject(e.target.value)}
         >
-          <option selected default></option>
-          <option>hassan</option>
+          {/* Default selected project */}
+          <option value={project?._id || ""}>
+            {project?.name || "Select Project"}
+          </option>
+          <option value="Inbox">Inbox</option>
+          {listOfProject
+            .filter((lp) => lp._id !== project?._id) // Handle undefined project
+            .map((lp) => (
+              <option key={lp._id} value={lp._id}>
+                {lp.name}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -167,19 +194,13 @@ const AddSubTaskModal = ({ user, project, reload, parentTaskID }) => {
     <>
       <button
         className="btn justify-start btn-xs bg-base-100 border-base-100 hover:bg-base-100 hover:border-base-100  hover:text-primary"
-        onClick={() => {
-          setIsOpen(true);
-        }}
+        onClick={() => setIsOpen(true)}
       >
         <PlusIcon />
       </button>
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-        }}
-      >
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <AddTaskForm
+          user={user}
           eHandler={setIsOpen}
           project={project}
           reload={reload}

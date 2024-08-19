@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LeftMenu from "../components/LeftMenu.jsx";
-import ContentTest from "../components/ContentTest.jsx";
+import ProjectContent from "../components/ProjectContent.jsx";
 import Divider from "../components/Divider.jsx";
-import AddProjectModal from "../components/AddProjectModal.jsx";
 import { auth } from "../firebase.js";
-
-import { Link, useNavigate } from "react-router-dom";
-import { Route, Routes } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getProjectByObjectIds } from "../api/userApi.js";
-import AddSubProjectModal from "../components/AddSubProjectModal.jsx";
-import RemoveProjectModal from "../components/RemoveProjectModal.jsx";
-import ChevronDownIcon from "../assets/icons/ChevronDownIcon.jsx";
-import ChevronRightIcon from "../assets/icons/ChevronRightIcon.jsx";
 import LeftProjectMenu from "../components/LeftProjectMenu.jsx";
 import Logo from "../components/Logo.jsx";
 import UserButton from "../components/UserButton.jsx";
@@ -20,7 +13,7 @@ import TodayContent from "../components/TodayContent.jsx";
 import UpcomingContent from "../components/UpcomingContent.jsx";
 
 const ApplicationPage = ({ user }) => {
-  const [project, setProject] = useState("inbox");
+  const [project, setProject] = useState("Inbox");
   const [projectList, setProjectList] = useState([]);
   const navigate = useNavigate();
 
@@ -106,17 +99,17 @@ const ApplicationPage = ({ user }) => {
       {(() => {
         switch (project) {
           case "Inbox":
-            return <InboxContent />;
+            return <InboxContent user={user} project={project} />;
           case "Today":
-            return <TodayContent />;
+            return <TodayContent user={user} project={project} />;
           case "Upcoming":
-            return <UpcomingContent />;
+            return <UpcomingContent user={user} project={project} />;
           case null:
             return <InboxContent />;
           case undefined:
             return <InboxContent />;
           default:
-            return <ContentTest user={user} project={project} />;
+            return <ProjectContent user={user} project={project} />;
         }
       })()}
     </div>

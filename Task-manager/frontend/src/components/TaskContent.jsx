@@ -5,7 +5,14 @@ import ChevronDownIcon from "../assets/icons/ChevronDownIcon";
 import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
 import CalendarIcon from "../assets/icons/CalendarIcon";
 import EditTaskModal from "./EditTaskModal";
-export const Task = ({ task, reload, user, project, eHandler }) => {
+export const Task = ({
+  task,
+  reload,
+  user,
+  project,
+  eHandler,
+  handleSetCommentsIsOpen,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const formatDate = (isoDateString) => {
@@ -26,6 +33,7 @@ export const Task = ({ task, reload, user, project, eHandler }) => {
       await axios.delete(`http://localhost:3000/task/delete/${task._id}`);
       console.log(`Task ${task._id} deleted successfully`);
       reload();
+      handleSetCommentsIsOpen(false);
     } catch (error) {
       console.error(`Error deleting task ${task._id}:`, error);
     }
@@ -33,21 +41,28 @@ export const Task = ({ task, reload, user, project, eHandler }) => {
 
   const handleTaskClick = () => {
     eHandler(task); // Set the current task when clicked
+    handleSetCommentsIsOpen(true);
   };
-
+  const priorityClasses = {
+    p1: "badge-error",
+    p2: "badge-warning",
+    p3: "badge-primary",
+    p4: "badge-base-100",
+    // Add more priorities here if needed
+  };
   return (
     <>
       <li key={task._id}>
-        <div className="ml-5 mr-10 w-full flex">
-          <div className="flex w- full bg-base-300/20 flex-row items-center mt-2">
+        <div className="ml-5 mr-10 w-5/6 flex">
+          <div className="flex transition-transform duration-300 w-full bg-base-300/20 flex-row items-center mt-2">
             <AddSubTaskModal
               user={user}
               project={project}
               reload={reload}
               parentTaskID={task._id}
             />
-            <button
-              className="btn btn-xs bg-base-100 border border-base-100 hover:bg-base-100 hover:text-primary hover:border-base-100"
+            <div
+              className=" bg-base-100 border border-base-100 hover:bg-base-100 hover:text-primary hover:border-base-100"
               onClick={handleToggle}
             >
               {isOpen ? (
@@ -59,18 +74,17 @@ export const Task = ({ task, reload, user, project, eHandler }) => {
                   <ChevronRightIcon />
                 </>
               )}
-            </button>
-
-            <button
-              className="flex flex-row justify-start btn w-full bg-warning-primary border border-base-100 ml-2"
+            </div>
+            <input
+              className="checkbox checkbox-sm ml-2"
+              type="checkbox"
+              onChange={handleDelete}
+            />
+            <div
+              className="flex flex-row  hover:bg-neutral justify-between items-center gap-2 w-full bg-warning-primary border border-base-100 ml-2"
               onClick={handleTaskClick}
             >
-              <input
-                className="checkbox checkbox-sm ml-2"
-                type="checkbox"
-                onChange={handleDelete}
-              />
-              <div className="flex flex-col gap-1">
+              <div className="flex ml-7 flex-col gap-1">
                 {" "}
                 <span className="text-lg">{task.name}</span>
                 <span className="text-xs w-20 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -89,33 +103,25 @@ export const Task = ({ task, reload, user, project, eHandler }) => {
                     <></>
                   )}
                 </span>
-                <span className="badge bg-base-200 text-xs ml-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-3"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                    />
-                  </svg>
 
-                  {task.assignedTo ? <>{task.assignedTo}</> : {}}
+                <span
+                  className={`badge text-xs ml-2 ${
+                    priorityClasses[task.priority] || ""
+                  }`}
+                >
+                  ! {task.priority}
                 </span>
-
-                <span className="badge text-xs ml-2">! {task.priority}</span>
               </div>
-            </button>
-            <EditTaskModal
-              taskID={task._id}
-              project={project}
-              reload={reload}
-            ></EditTaskModal>
+            </div>
+            {project !== "Today" && project !== "Upcoming" && (
+              <EditTaskModal
+                user={user}
+                taskID={task._id}
+                project={project}
+                reload={reload}
+                currentTask={task}
+              ></EditTaskModal>
+            )}
           </div>
         </div>
 
@@ -129,6 +135,7 @@ export const Task = ({ task, reload, user, project, eHandler }) => {
                 user={user}
                 project={project}
                 eHandler={eHandler}
+                handleSetCommentsIsOpen={handleSetCommentsIsOpen}
               />
             ))}
           </ul>
@@ -144,6 +151,7 @@ const TaskContent = ({
   user,
   project,
   handleTaskSelection,
+  handleSetCommentsIsOpen,
 }) => {
   return (
     <ul className="w-full">
@@ -155,6 +163,7 @@ const TaskContent = ({
           user={user}
           project={project}
           eHandler={handleTaskSelection}
+          handleSetCommentsIsOpen={handleSetCommentsIsOpen}
         />
       ))}
     </ul>

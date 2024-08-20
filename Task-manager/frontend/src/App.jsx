@@ -3,8 +3,6 @@ import { Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import RegisterPage from "./pages/RegisterPage";
 import ApplicationPage from "./pages/ApplicationPage";
-import axios from "axios";
-import { Link } from "react-router-dom";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserById } from "./api/userApi";

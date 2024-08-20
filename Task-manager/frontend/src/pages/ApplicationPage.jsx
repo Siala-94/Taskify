@@ -11,37 +11,11 @@ import UserButton from "../components/UserButton.jsx";
 import InboxContent from "../components/InboxContent.jsx";
 import TodayContent from "../components/TodayContent.jsx";
 import UpcomingContent from "../components/UpcomingContent.jsx";
-
+import { populateProjectList } from "../helpers/projectHelpers.js";
 const ApplicationPage = ({ user }) => {
   const [project, setProject] = useState("Inbox");
   const [projectList, setProjectList] = useState([]);
   const navigate = useNavigate();
-
-  const populateProjectList = (projects) => {
-    const projectMap = new Map();
-
-    projects.forEach((project) => {
-      projectMap.set(project._id, { ...project, subProjects: [] });
-    });
-
-    projects.forEach((project) => {
-      if (project.subProjects && project.subProjects.length > 0) {
-        project.subProjects.forEach((subProjectId) => {
-          if (projectMap.has(subProjectId)) {
-            projectMap
-              .get(project._id)
-              .subProjects.push(projectMap.get(subProjectId));
-          }
-        });
-      }
-    });
-
-    const nestedProjects = projects.filter(
-      (project) => !projects.some((p) => p.subProjects.includes(project._id))
-    );
-
-    return nestedProjects.map((project) => projectMap.get(project._id));
-  };
 
   const fetchProjects = async () => {
     if (!user || !user._id) return;
@@ -86,8 +60,9 @@ const ApplicationPage = ({ user }) => {
         <Logo handleLinkClick={handleLinkClick} />
 
         <UserButton user={user} />
-        <Divider />
+
         <LeftMenu handlerFunction={handleSetProject} />
+        <div className="divider"></div>
         <LeftProjectMenu
           user={user}
           fetchProjects={fetchProjects}

@@ -21,41 +21,52 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-const AddSubProjectModal = ({ user, projectID, reload }) => {
+const ProjectModal = ({ user, projectID = null, reload, type }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const URL = "http://localhost:3000";
+  const navigate = useNavigate();
 
   const handleNewProject = async (e) => {
     e.preventDefault();
-
     const members = [user._id];
+    const endpoint =
+      type === "subproject"
+        ? `${URL}/project/addSubProject/${projectID}`
+        : `${URL}/project/add`;
+
     try {
-      const res = await axios.post(
-        `${URL}/project/addSubProject/${projectID}`,
-        {
-          name: projectName,
-          members: members,
-        }
-      );
+      const res = await axios.post(endpoint, {
+        name: projectName,
+        members: members,
+      });
 
       setIsOpen(false); // Close the modal after submission
       setProjectName(""); // Reset the project name input
-      reload();
+      reload(); // Call the reload function to refresh the project list
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const getButtonLabel = () => {
+    switch (type) {
+      case "subproject":
+        return "";
+      case "project":
+      default:
+        return "Add Root Project";
     }
   };
 
   return (
     <>
       <button
-        className=" hover:text-primary"
-        onClick={() => {
-          setIsOpen(true);
-        }}
+        className="btn justify-start btn-xs bg-base-300 border-base-300 hover:text-primary"
+        onClick={() => setIsOpen(true)}
       >
         <PlusIcon />
+        {getButtonLabel()}
       </button>
       <Modal
         isOpen={isOpen}
@@ -67,11 +78,9 @@ const AddSubProjectModal = ({ user, projectID, reload }) => {
           <div className="form-control">
             <input
               className="input input-bordered"
-              placeholder="project name"
+              placeholder="Project name"
               value={projectName}
-              onChange={(e) => {
-                setProjectName(e.target.value);
-              }}
+              onChange={(e) => setProjectName(e.target.value)}
             />
           </div>
           <div className="hero flex justify-end mt-4">
@@ -80,10 +89,10 @@ const AddSubProjectModal = ({ user, projectID, reload }) => {
               type="button"
               onClick={() => setIsOpen(false)}
             >
-              cancel
+              Cancel
             </button>
             <button className="btn bg-base-100 ml-6" type="submit">
-              submit
+              Submit
             </button>
           </div>
         </form>
@@ -92,4 +101,4 @@ const AddSubProjectModal = ({ user, projectID, reload }) => {
   );
 };
 
-export default AddSubProjectModal;
+export default ProjectModal;

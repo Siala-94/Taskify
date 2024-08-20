@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import AddSubTaskModal from "./AddSubTaskModal";
+import { deleteTask } from "../api/taskApi";
 import ChevronDownIcon from "../assets/icons/ChevronDownIcon";
 import ChevronRightIcon from "../assets/icons/ChevronRightIcon";
 import CalendarIcon from "../assets/icons/CalendarIcon";
-import EditTaskModal from "./EditTaskModal";
+
+import TaskModal from "./TaskModal";
 export const Task = ({
   task,
   reload,
@@ -29,14 +30,9 @@ export const Task = ({
   };
 
   const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:3000/task/delete/${task._id}`);
-      console.log(`Task ${task._id} deleted successfully`);
-      reload();
-      handleSetCommentsIsOpen(false);
-    } catch (error) {
-      console.error(`Error deleting task ${task._id}:`, error);
-    }
+    await deleteTask(task._id);
+    reload();
+    handleSetCommentsIsOpen(false);
   };
 
   const handleTaskClick = () => {
@@ -55,11 +51,12 @@ export const Task = ({
       <li key={task._id}>
         <div className="ml-5 mr-10 w-5/6 flex">
           <div className="flex transition-transform duration-300 w-full bg-base-300/20 flex-row items-center mt-2">
-            <AddSubTaskModal
+            <TaskModal
               user={user}
               project={project}
               reload={reload}
               parentTaskID={task._id}
+              type="subtask"
             />
             <div
               className=" bg-base-100 border border-base-100 hover:bg-base-100 hover:text-primary hover:border-base-100"
@@ -114,13 +111,14 @@ export const Task = ({
               </div>
             </div>
             {project !== "Today" && project !== "Upcoming" && (
-              <EditTaskModal
+              <TaskModal
                 user={user}
                 taskID={task._id}
                 project={project}
                 reload={reload}
                 currentTask={task}
-              ></EditTaskModal>
+                type="edit"
+              ></TaskModal>
             )}
           </div>
         </div>

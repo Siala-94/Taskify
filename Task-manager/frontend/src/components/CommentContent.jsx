@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+import { getUserByObjectID } from "../api/projectApi";
+import { addComment } from "../api/taskApi";
 
 const CommentContent = ({
   user,
@@ -26,13 +28,9 @@ const CommentContent = ({
         const userNameMapping = {};
         await Promise.all(
           uniqueUserIds.map(async (uid) => {
-            try {
-              const res = await axios.get(`http://localhost:3000/ouid/${uid}`);
-              console.log(res.data);
-              userNameMapping[uid] = res.data.email; //
-            } catch (error) {
-              console.error(`Failed to fetch user with ID ${uid}:`, error);
-            }
+            const responseData = await getUserByObjectID(uid);
+            console.log(responseData);
+            userNameMapping[uid] = responseData.email; //
           })
         );
 
@@ -50,16 +48,8 @@ const CommentContent = ({
   const handleOnClick = async () => {
     const taskID = currentTask._id;
     const body = { comment: comment, user: user };
-    try {
-      const res = await axios.put(
-        `http://localhost:3000/task/put/comment/${taskID}`,
-        body
-      );
-      console.log(res);
-      handleReload();
-    } catch (error) {
-      alert(error.message);
-    }
+    const res = await addComment(taskID, body);
+    handleReload();
   };
 
   const formatDate = (dateString) => {

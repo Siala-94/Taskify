@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import AddTaskModal from "./AddTaskModal.jsx";
 import TaskContent, { Task } from "./TaskContent.jsx";
 import CommentContent from "./CommentContent.jsx";
-import HeaderContent from "./HeaderContent.jsx";
+import { populateTaskList } from "../helpers/taskHelpers.js";
+import { getTasksWithTodayDate } from "../api/taskApi.js";
 
 const TodayContent = ({ user, project }) => {
   const [taskList, setTaskList] = useState([]);
@@ -15,40 +14,11 @@ const TodayContent = ({ user, project }) => {
   const handleSetCommentsIsOpen = (e) => {
     setCommentsIsOpen(e);
   };
-  const populateTaskList = (tasks) => {
-    const taskMap = new Map();
-
-    tasks.forEach((task) => {
-      taskMap.set(task._id, { ...task, subTasks: [] });
-    });
-
-    tasks.forEach((task) => {
-      if (task.subTask && task.subTask.length > 0) {
-        task.subTask.forEach((subTaskId) => {
-          const subTask = taskMap.get(subTaskId);
-          if (subTask) {
-            taskMap.get(task._id).subTasks.push(subTask);
-          }
-        });
-      }
-    });
-
-    const nestedTasks = tasks
-      .filter(
-        (task) => !tasks.some((t) => t.subTask && t.subTask.includes(task._id))
-      )
-      .map((task) => taskMap.get(task._id));
-
-    return nestedTasks;
-  };
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/task/get/tasksWithTodayDate/${user._id}`
-      );
-
-      const populatedTasks = populateTaskList(response.data);
+      const responseData = await getTasksWithTodayDate(user._id);
+      const populatedTasks = populateTaskList(responseData);
       setTaskList(populatedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);

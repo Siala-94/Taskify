@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import AddTaskModal from "./AddTaskModal.jsx";
+
+import TaskModal from "./TaskModal.jsx";
 import TaskContent, { Task } from "./TaskContent.jsx";
 import CommentContent from "./CommentContent.jsx";
-import HeaderContent from "./HeaderContent.jsx";
-
+import { getTasksWithNoProject } from "../api/taskApi.js";
+import { populateTaskList } from "../helpers/taskHelpers.js";
 const InboxContent = ({ user, project }) => {
   const [taskList, setTaskList] = useState([]);
   const [membersList, setMembersList] = useState([]);
@@ -15,44 +15,12 @@ const InboxContent = ({ user, project }) => {
   const handleSetCommentsIsOpen = (e) => {
     setCommentsIsOpen(e);
   };
-  const populateTaskList = (tasks) => {
-    const taskMap = new Map();
-
-    tasks.forEach((task) => {
-      taskMap.set(task._id, { ...task, subTasks: [] });
-    });
-
-    tasks.forEach((task) => {
-      if (task.subTask && task.subTask.length > 0) {
-        task.subTask.forEach((subTaskId) => {
-          const subTask = taskMap.get(subTaskId);
-          if (subTask) {
-            taskMap.get(task._id).subTasks.push(subTask);
-          }
-        });
-      }
-    });
-
-    const nestedTasks = tasks
-      .filter(
-        (task) => !tasks.some((t) => t.subTask && t.subTask.includes(task._id))
-      )
-      .map((task) => taskMap.get(task._id));
-
-    return nestedTasks;
-  };
 
   const fetchTasks = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/task/get/inbox/${user._id}`
-      );
-
-      const populatedTasks = populateTaskList(response.data);
-      setTaskList(populatedTasks);
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    }
+    const tasks = await getTasksWithNoProject(user._id);
+    console.log(1);
+    const populatedTasks = populateTaskList(tasks);
+    setTaskList(populatedTasks);
   };
 
   const handleReload = async () => {
@@ -76,7 +44,7 @@ const InboxContent = ({ user, project }) => {
       </div>
       <div className="divider"></div>
 
-      <AddTaskModal user={user} project={project} reload={fetchTasks} />
+      <TaskModal user={user} project={project} reload={fetchTasks} />
 
       <div className="mt-4 flex h-4/5 flex-row w-full">
         <div className="w-full">

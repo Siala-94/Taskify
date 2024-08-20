@@ -7,7 +7,7 @@ const Logo = ({ handleLinkClick }) => {
         onClick={() => {
           handleLinkClick();
         }}
-        className="btn flex hover:bg-base-100 items-center bg-base-300 border-base-300 text-primary text-3xl"
+        className="btn flex hover:bg-base-100 items-center bg-base-300 text-primary text-3xl"
       >
         Taskify
       </button>

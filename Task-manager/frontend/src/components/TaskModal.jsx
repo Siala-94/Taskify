@@ -38,11 +38,11 @@ const TaskForm = ({
     e.preventDefault();
 
     const taskData = {
-      name: taskName,
-      description: description,
-      dueDate: dueDate,
-      priority: priority,
-      comments: [],
+      name: taskName || currentTask.name,
+      description: description || currentTask.description,
+      dueDate: dueDate || currentTask.dueDate,
+      priority: priority || currentTask.priority,
+      comments: currentTask.comments || [],
       project: selectedProject === "Inbox" ? null : selectedProject,
       members: project?.members || [user._id], // Handle undefined project
     };

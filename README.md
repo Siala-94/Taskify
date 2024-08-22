@@ -9,6 +9,11 @@ To achieve this, some functionality goals are outlined, that the project aims to
 At the end of the project, i have created a task management application where users can interact and collaborate on managing tasks.
 My learning objective for the project is to be able to create applications that use a full stack and with successfully managing states such that application runs as expected without unnecessary renders. I should also understand how code interact with eachother and be able to write clean and understandable code where code is not being unnecessarily rewritten
 
+# Key takeaways
+
+coding is a zig zag experience, at first i was afraid of pushing to git so as to not show how little i new, most (all) of my progress happened when i began just experimenting with the code and not being scared of failing.
+Great learning experience!
+
 ## Project screen cast
 
 https://youtu.be/l7PCmMPY5Gs

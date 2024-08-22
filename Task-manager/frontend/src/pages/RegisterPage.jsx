@@ -1,46 +1,20 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo.jsx";
-import { auth } from "../firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import axios from "axios";
+
+import { createUser } from "../api/authenticationApi.js";
+import { saveUserToDB } from "../api/userApi.js";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const SaveUserToDB = async (uid, email) => {
-    try {
-      await axios.post("http://localhost:3000/register/add", {
-        firebaseUid: uid,
-        email: email,
-        projects: [],
-      });
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
   const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log("creating user");
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log("added user");
-      const user = userCredential.user;
-      console.log(user);
-      alert("Account created successfully!");
-      await SaveUserToDB(user.uid, user.email);
-      alert("User saved to database!");
-      navigate("/"); // Use navigate to redirect to the login page
-    } catch (error) {
-      console.log(error.code, error.message);
-    }
+    user = await createUser(email, password);
+    const res = await saveUserToDB(user.uid, user.email);
+    navigate("/");
   };
 
   return (

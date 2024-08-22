@@ -1,16 +1,12 @@
 import { auth } from "../firebase.js";
 import React from "react";
-import { signOut } from "firebase/auth";
+import { signUserOut } from "../api/authenticationApi.js";
 
 const UserButton = ({ user }) => {
   const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      navigate("/");
-    } catch (error) {
-      console.error(error.message);
-    }
+    await signUserOut();
   };
+
   return (
     <div className="dropdown">
       <div tabIndex={0} role="button">

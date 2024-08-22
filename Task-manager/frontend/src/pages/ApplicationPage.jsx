@@ -12,6 +12,7 @@ import InboxContent from "../components/InboxContent.jsx";
 import TodayContent from "../components/TodayContent.jsx";
 import UpcomingContent from "../components/UpcomingContent.jsx";
 import { populateProjectList } from "../helpers/projectHelpers.js";
+
 const ApplicationPage = ({ user }) => {
   const [project, setProject] = useState("Inbox");
   const [projectList, setProjectList] = useState([]);
@@ -22,7 +23,6 @@ const ApplicationPage = ({ user }) => {
 
     try {
       const projectLists = await getProjectByObjectIds(user._id);
-
       const populatedList = populateProjectList(projectLists);
       setProjectList(populatedList);
     } catch (error) {
@@ -30,18 +30,9 @@ const ApplicationPage = ({ user }) => {
     }
   };
 
-  const startLongPolling = () => {
-    const poll = async () => {
-      await fetchProjects(); // Fetch and update the project list
-      setTimeout(poll, 5000); // Wait for 5 seconds before polling again
-    };
-
-    poll();
-  };
-
   useEffect(() => {
     if (user) {
-      startLongPolling(); // Start polling when user is available
+      fetchProjects(); // Fetch projects once when the user is available
     }
   }, [user]);
 

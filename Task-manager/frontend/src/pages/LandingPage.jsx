@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signIn } from "../api/authenticationApi.js";
 import { auth } from "../firebase.js";
 import Logo from "../components/Logo.jsx";
 
@@ -11,24 +11,8 @@ const LandingPage = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      console.log("successfully signed in", user);
-
-      navigate("/");
-    } catch (error) {
-      alert(error.code, error.message);
-      console.log(error.code, error.message);
-
-      error.message === "Firebase: Error (auth/invalid-credential)."
-        ? alert("wrong username or password")
-        : console.log(error.message);
-    }
+    const user = await signIn(email, password);
+    navigate("/");
   };
 
   return (

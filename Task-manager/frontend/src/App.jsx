@@ -13,6 +13,7 @@ const App = () => {
   const handleSetUser = async (u) => {
     try {
       const data = await getUserById(u.uid);
+
       setUser(data);
     } catch (error) {
       console.error(error.message);
@@ -23,7 +24,8 @@ const App = () => {
       user ? handleSetUser(user) : setUser(null);
     });
     return () => unsubscribe();
-  }, []);
+  }, [auth, user]);
+
   return (
     <>
       <Routes>
@@ -31,7 +33,10 @@ const App = () => {
           path="/"
           element={user ? <ApplicationPage user={user} /> : <LandingPage />}
         />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/register"
+          element={user ? <ApplicationPage user={user} /> : <RegisterPage />}
+        />
         <Route
           path="/application/*"
           element={user ? <ApplicationPage user={user} /> : <LandingPage />}
